@@ -43,6 +43,14 @@
         </v-col>
       </v-row>
     </v-container>
+    <!-- <v-dialog
+      v-model="settings"
+      fullscreen
+      hide-overlay
+      transition="dialog-bottom-transition"
+    >
+    <SessionSettingsDialog v-on:close="settings = false" :sessioName="sessionName" :beacons="beacons"></SessionSettingsDialog>
+    </v-dialog> -->
     <v-dialog
       v-model="settings"
       fullscreen
@@ -122,25 +130,34 @@
           </v-container>
         </v-card>
       </v-dialog>
-      <v-snackbar
-        v-model="snackbar"
-        :color="axiosSuccess ? 'success' : 'error'"
-      >
-        <span class="overline font-weight-black">{{ snackbarMsg }}</span>
+          <v-snackbar
+      v-model="snackbar"
+      :color="axiosSuccess ? 'success' : 'error'"
+    >
+      <span class="overline font-weight-black">{{snackbarMsg}}</span>
 
-        <template v-slot:action="{ attrs }">
-          <v-btn color="white" text v-bind="attrs" @click="snackbar = false">
-            Fermer
-          </v-btn>
-        </template>
-      </v-snackbar>
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="white"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Fermer
+        </v-btn>
+      </template>
+    </v-snackbar>
     </v-dialog>
   </v-main>
 </template>
 
 <script>
 import axios from "axios";
+// import SessionSettingsDialog from '@/components/SessionSettingsDialog.vue';
 export default {
+    components: {
+        // SessionSettingsDialog,
+    },
   data() {
     return {
       students: [],
@@ -255,10 +272,9 @@ export default {
       try {
         await axios.delete(
           `http://localhost:5000/api/sessions/${this.$route.params.session_id}/`,
-          { data: { _id: item._id } }
-        );
-        this.axiosSuccess = true;
-        this.snackbarMsg = "Balise suprimée avec succès!";
+          { data: {_id: item._id} });
+          this.axiosSuccess = true;
+      this.snackbarMsg = "Balise suprimée avec succès!";
         this.snackbar = true;
       } catch (error) {
         console.log(error);

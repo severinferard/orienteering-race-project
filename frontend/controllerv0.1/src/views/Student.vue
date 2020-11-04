@@ -30,172 +30,54 @@
         <v-col cols="6">
           <v-row style="height: 100%">
             <v-col cols="4">
-              <v-card height="100%">
-                <v-card-title class="py-0">
-                  <v-icon x-large color="primary" class="mt-2"
-                    >mdi-timer</v-icon
-                  >
-                </v-card-title>
-                <v-row style="height: 200px">
-                  <v-col
-                    ><v-card-actions class="justify-center">
-                      <v-progress-circular
-                        :rotate="360"
-                        :size="150"
-                        :width="5"
-                        :value="70"
-                        color="primary"
-                      >
-                        <v-container fluid class="pt-7">
-                          <v-row>
-                            <v-col class="pa-0"
-                              ><span class="display-2">{{
-                                Math.floor(chrono / 60)
-                              }}</span>
-                              <span class="display-1">:</span>
-                              <span class="display-2">{{
-                                chrono % 60
-                              }}</span></v-col
-                            >
-                          </v-row>
-                          <v-row>
-                            <v-col class="pa-0 text-center">min</v-col>
-                          </v-row>
-                        </v-container>
-                      </v-progress-circular>
-                    </v-card-actions></v-col
-                  >
-                </v-row>
-                <v-row
-                  ><v-col>
-                    <v-card-actions class="justify-center"
-                      ><span class="overline">Chrono</span></v-card-actions
-                    ></v-col
-                  ></v-row
-                >
-              </v-card>
+              <StudentDataCard icon="mdi-timer" title="Chrono" unit="min">
+                <template v-slot:value>
+                  <span class="display-2">{{ Math.floor(chrono / 60) }}</span>
+                  <span class="display-1">:</span>
+                  <span class="display-2">{{ chrono % 60 }}</span>
+                </template>
+              </StudentDataCard>
             </v-col>
             <v-col cols="4">
-              <v-card height="100%">
-                <v-card-title class="py-0">
-                  <v-icon x-large color="primary lighten-1" class="mt-2"
-                    >mdi-shoe-print</v-icon
-                  ></v-card-title
-                >
-
-                <v-row style="height: 200px"
-                  ><v-col
-                    ><v-card-actions class="justify-center">
-                      <v-progress-circular
-                        :rotate="360"
-                        :size="150"
-                        :width="5"
-                        :value="86"
-                        color="primary lighten-1"
-                      >
-                        <v-container fluid class="pt-7">
-                          <v-row>
-                            <v-col class="pa-0"
-                              ><span class="display-2">{{ distance }}</span>
-                            </v-col>
-                          </v-row>
-                          <v-row>
-                            <v-col class="pa-0 text-center">m</v-col>
-                          </v-row>
-                        </v-container>
-                      </v-progress-circular>
-                    </v-card-actions></v-col
-                  ></v-row
-                >
-                <v-row
-                  ><v-col>
-                    <v-card-actions class="justify-center"
-                      ><span class="overline">Distance</span></v-card-actions
-                    ></v-col
-                  ></v-row
-                >
-              </v-card>
+              <StudentDataCard
+                icon="mdi-shoe-print"
+                :value="distance"
+                title="Distance"
+                unit="m"
+              ></StudentDataCard>
             </v-col>
             <v-col cols="4">
-              <v-card height="100%">
-                <v-card-title class="py-0">
-                  <v-icon x-large color="primary lighten-2" class="mt-2">
-                    mdi-crosshairs-gps
-                  </v-icon>
-                </v-card-title>
-                <v-row style="height: 200px"
-                  ><v-col
-                    ><v-card-actions class="justify-center">
-                      <v-progress-circular
-                        :rotate="360"
-                        :size="150"
-                        :width="5"
-                        :value="percentBeacons"
-                        color="primary lighten-2"
-                      >
-                        <v-container fluid class="pt-7">
-                          <v-row>
-                            <v-col class="pa-0"
-                              ><span class="display-2">{{
-                                validedBeacons
-                              }}</span>
-                            </v-col>
-                          </v-row>
-                          <v-row>
-                            <v-col class="pa-0 text-center">-</v-col>
-                          </v-row>
-                        </v-container>
-                      </v-progress-circular>
-                    </v-card-actions></v-col
-                  ></v-row
-                >
-                <v-row
-                  ><v-col>
-                    <v-card-actions class="justify-center"
-                      ><span class="overline">Balises</span></v-card-actions
-                    ></v-col
-                  ></v-row
-                >
-              </v-card>
+              <StudentDataCard
+                icon="mdi-crosshairs-gps"
+                :value="validedBeacons"
+                title="Balises"
+                unit="-"
+              ></StudentDataCard>
             </v-col>
           </v-row>
         </v-col>
         <v-col cols="6">
           <v-row style="height: 100%">
             <v-col>
-              <v-card height="100%">
-                <v-card-title class="py-0">
-                  <v-icon x-large color="primary lighten-1" class="mt-2">
-                    mdi-speedometer
-                  </v-icon>
-                  <v-spacer></v-spacer>
-                  <v-row align="end">
-                    <span class="display-1 primary--text">{{
-                      averageSpeed
-                    }}</span>
-                    <span class="overline ml-1">km/h</span>
-                  </v-row>
-                </v-card-title>
-                <v-row style="height: 200px"
-                  ><v-col>
-                    <v-sheet>
-                      <v-sparkline
-                        :smooth="16"
-                        :gradient="['#ffd200', '#1feaea', '#f72047']"
-                        :line-width="3"
-                        :value="heartbeats"
-                        auto-draw
-                        stroke-linecap="round"
-                      ></v-sparkline> </v-sheet></v-col
-                ></v-row>
-                <v-row
-                  ><v-col>
-                    <v-card-actions class="justify-center"
-                      ><span class="overline">Vitesse</span></v-card-actions
-                    ></v-col
-                  ></v-row
-                >
-              </v-card>
+              <StudentGraphCard
+                title="Vitesse"
+                unit="km/h"
+                :value="averageSpeed"
+                icon="mdi-speedometer"
+              >
+                <template v-slot:graph>
+                  <v-sheet>
+                    <v-sparkline
+                      :smooth="16"
+                      :gradient="['#ffd200', '#1feaea', '#f72047']"
+                      :line-width="3"
+                      :value="heartbeats"
+                      auto-draw
+                      stroke-linecap="round"
+                    ></v-sparkline>
+                  </v-sheet>
+                </template>
+              </StudentGraphCard>
             </v-col>
           </v-row>
         </v-col>
@@ -220,42 +102,11 @@
         ></v-row
       >
       <v-row>
-        <v-card class="ma-3" width="100%">
-          <v-container>
-            <v-row>
-              <v-col cols="5">
-                <v-form ref="form" v-model="valid">
-                  <v-textarea
-                    rows="1"
-                    prepend-icon="mdi-comment"
-                    auto-grow
-                    row-height="15"
-                    label="Mon ressenti sur ma course..."
-                    v-model="comment"
-                    :rules="[
-                      (v) => v.length > 0 || 'Un commentaire est requis',
-                    ]"
-                  >
-                  </v-textarea>
-                </v-form>
-              </v-col>
-              <v-col></v-col>
-              <v-col cols="5" class="text-center">
-                <v-rating
-                  v-model="rating"
-                  background-color="primary lighten-3"
-                  color="primary"
-                  large
-                ></v-rating>
-              </v-col>
-            </v-row>
-            <v-card-actions class="justify-center"
-              ><v-btn :disabled="!valid" @click="sendForm"
-                >Valider</v-btn
-              ></v-card-actions
-            >
-          </v-container>
-        </v-card>
+        <StudentFeedbackForm
+          :rating="rating"
+          :comment="comment"
+          v-on:success="snackbar = true"
+        ></StudentFeedbackForm>
       </v-row>
     </div>
     <v-snackbar v-model="snackbar" color="success">
@@ -273,9 +124,15 @@
 <script>
 import axios from "axios";
 import MyMap from "@/components/MyMap.vue";
+import StudentDataCard from "@/components/StudentDataCard.vue";
+import StudentGraphCard from "@/components/StudentGraphCard.vue";
+import StudentFeedbackForm from "@/components/StudentFeedbackForm.vue";
 export default {
   components: {
     MyMap,
+    StudentDataCard,
+    StudentGraphCard,
+    StudentFeedbackForm,
   },
   data() {
     return {
@@ -297,8 +154,6 @@ export default {
       balises: [],
       loadingData: false,
       loadingError: false,
-      loadingErrorStatus: "",
-      valid: false,
       snackbar: false,
     };
   },
@@ -339,21 +194,6 @@ export default {
         this.loadingErrorStatus = error;
       }
       this.loadingData = false;
-    },
-    async sendForm() {
-      console.log("send");
-      try {
-        await axios.post(
-          `http://localhost:5000/api/runs/${this.$route.params.session_id}/${this.$route.params.student_id}`,
-          {
-            comment: this.comment,
-            rating: this.rating,
-          }
-        );
-        this.snackbar = true;
-      } catch (error) {
-        console.log(error);
-      }
     },
   },
   created() {
