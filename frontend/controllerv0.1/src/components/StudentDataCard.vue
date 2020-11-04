@@ -10,7 +10,7 @@
             :rotate="360"
             :size="150"
             :width="5"
-            :value="70"
+            :value="percent"
             color="primary"
           >
             <v-container fluid class="pt-7">
@@ -42,7 +42,7 @@
 
 <script>
 export default {
-  props: ["title", "value", "icon", "unit"],
+  props: ["title", "value", "icon", "unit", "percent"],
   data() {
     return {};
   },

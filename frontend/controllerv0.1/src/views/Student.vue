@@ -23,18 +23,18 @@
     </v-app-bar>
     <v-alert v-if="loadingError" type="error">{{ loadingErrorStatus }}</v-alert>
     <v-card color="lime" class="map-wrapper mx-5 mt-5">
-      <MyMap ref="myMap"> </MyMap>
+      <MyMap ref="myMap" :geoJson="geoJson"> </MyMap>
     </v-card>
     <div class="pt-0 pl-0 mx-5">
       <v-row height="300px">
         <v-col cols="6">
           <v-row style="height: 100%">
             <v-col cols="4">
-              <StudentDataCard icon="mdi-timer" title="Chrono" unit="min">
+              <StudentDataCard icon="mdi-timer" title="Chrono" unit="min" percent="100">
                 <template v-slot:value>
                   <span class="display-2">{{ Math.floor(chrono / 60) }}</span>
                   <span class="display-1">:</span>
-                  <span class="display-2">{{ chrono % 60 }}</span>
+                  <span class="display-2">{{ getMins(chrono) }}</span>
                 </template>
               </StudentDataCard>
             </v-col>
@@ -42,6 +42,7 @@
               <StudentDataCard
                 icon="mdi-shoe-print"
                 :value="distance"
+                percent="100"
                 title="Distance"
                 unit="m"
               ></StudentDataCard>
@@ -52,6 +53,7 @@
                 :value="validedBeacons"
                 title="Balises"
                 unit="-"
+                :percent="percentBeacons"
               ></StudentDataCard>
             </v-col>
           </v-row>
@@ -71,7 +73,7 @@
                       :smooth="16"
                       :gradient="['#ffd200', '#1feaea', '#f72047']"
                       :line-width="3"
-                      :value="heartbeats"
+                      :value="speeds"
                       auto-draw
                       stroke-linecap="round"
                     ></v-sparkline>
@@ -136,25 +138,26 @@ export default {
   },
   data() {
     return {
-      heartbeats: Array.from({ length: 20 }, this.heartbeat),
-      id: "",
-      sessionName: "",
-      sessionId: this.$route.params.session_id,
+      id          : "",
+      sessionName : "",
+      sessionId   : this.$route.params.session_id,
       averageSpeed: 0,
-      distance: 0,
-      chrono: 0,
-      rating: 0,
-      comment: "",
-      headers: [
+      distance    : 0,
+      chrono      : 0,
+      speeds      : [],
+      rating      : 0,
+      comment     : "",
+      headers     : [
         { text: "ID", value: "id" },
         { text: "Temps (s)", value: "time" },
         { text: "Vitesse (km/h)", value: "avgSpeed" },
         { text: "Validée", value: "valided" },
       ],
-      balises: [],
-      loadingData: false,
+      balises     : [],
+      geoJson: {},
+      loadingData : false,
       loadingError: false,
-      snackbar: false,
+      snackbar    : false,
     };
   },
   computed: {
@@ -167,8 +170,8 @@ export default {
     },
   },
   methods: {
-    heartbeat() {
-      return Math.ceil(Math.random() * (120 - 80) + 80);
+    getMins(chrono) {
+      return (chrono % 60) < 10 ? "0" + chrono % 60 : chrono % 60;
     },
     async loadData() {
       this.loadingData = true;
@@ -176,19 +179,22 @@ export default {
         const res = await axios.get(
           `http://localhost:5000/api/runs/${this.$route.params.session_id}/${this.$route.params.student_id}`
         );
-        const data = res.data;
-        this.sessionName = data.sessionName;
-        this.id = data.id;
+        const data        = res.data;
         this.balises = data.beacons.map((beacon) => {
           if (beacon.valided) return beacon;
           (beacon.time = "-"), (beacon.avgSpeed = "-");
           return beacon;
         });
-        this.chrono = data.time;
-        this.averageSpeed = data.avgSpeed;
-        this.distance = data.distance;
-        this.comment = data.comment;
-        this.rating = data.rating;
+        this.sessionName  = data.sessionName;
+        this.id           = data.id;
+        this.chrono       = data.time;
+        this.averageSpeed = data.avgSpeed.toFixed(1);
+        this.distance     = data.distance.toFixed();
+        this.speeds       = data.speeds;
+        this.comment      = data.comment;
+        this.rating       = data.rating;
+        this.geoJson = data.geoJon;
+        console.log("student",data.geoJon)
       } catch (error) {
         this.loadingError = true;
         this.loadingErrorStatus = error;
