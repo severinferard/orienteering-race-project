@@ -6,38 +6,26 @@
 import "leaflet/dist/leaflet.css";
 // import { rainbow } from "rainbowvis.js"
 var Rainbow = require("rainbowvis.js");
-// import icon from 'leaflet/dist/images/marker-icon.png';
-// import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import L from "leaflet";
 export default {
-  props: ["geoJson"],
+  props: ["geoJson", "center"],
   data() {
     return {
       map: null,
-      // geojson: {
-      //   type: "FeatureCollection",
-      //   features: [
-      //     {
-      //       type: "Feature",
-      //       properties: {},
-      //       geometry: {
-      //         type: "Point",
-      //         coordinates: [2.200108766555786, 48.83842089934189],
-      //       },
-      //     },
-      //   ],
-      // },
     };
   },
   watch: {
     geoJson: function (newval) {
-      console.log("watch", newval);
       this.addGeoJson(newval);
     },
+    center: function(newval) {
+      console.log('center', newval)
+      this.map.setView([newval[1], newval[0]], 16)
+    }
   },
   methods: {
     setupLeaflet() {
-      let map = L.map("map").setView([48.838503, 2.200796], 16);
+      let map = L.map("map");
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -76,10 +64,11 @@ export default {
           "<div class='marker-pin-not-valided'></div><i class='material-icons'>close-box</i>",
         iconSize: [30, 42],
         iconAnchor: [15, 42],
+        shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
       });
 
       let rainbowvis = new Rainbow();
-      rainbowvis.setNumberRange(0, 0.2);
+      rainbowvis.setNumberRange(0, 10);
       rainbowvis.setSpectrum("red", "orange", "green");
       L.geoJSON(geojson, {
         pointToLayer: function (feature, latlng) {
@@ -102,10 +91,6 @@ export default {
       }).addTo(this.map);
       L.geoJSON(geojson, {
         style: function (feature) {
-          console.log(
-            feature.properties.speed,
-            rainbowvis.colorAt(feature.properties.speed)
-          );
           return {
             color: "#" + rainbowvis.colorAt(feature.properties.speed),
             weight: 5,

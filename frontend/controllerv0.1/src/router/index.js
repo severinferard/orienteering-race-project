@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import StudentPage from '../views/Student.vue'
 import SessionPage from '../views/Session.vue'
+import SessionsPage from '../views/Sessions.vue'
 
 import { LMap, LTileLayer, LMarker } from 'vue2-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -31,6 +32,11 @@ const routes = [
     path: '/session/:session_id',
     name: 'Session',
     component: SessionPage
+  },
+  {
+    path: '/session/',
+    name: 'Sessions',
+    component: SessionsPage
   },
   {
     path: '/session/:session_id/student-recap/:student_id',

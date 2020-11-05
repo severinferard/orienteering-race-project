@@ -15,14 +15,10 @@ static getGeoJsonPointsFromCoords(coords) {
     });
   }
 
-  /**
-   * @param {Array}  points Array of GeoJson points.
-   * @return {Array} Array of speed for each point in points.
-   */
   static getSpeedFromPoints(points, sampleRate) {
     return points.map((point, index) => {
       if (index === 0) return 0;
-      return turfDistance(point, points[index - 1]) / (sampleRate / 60);
+      return turfDistance(point, points[index - 1]) / (sampleRate / 3600);
     });
   }
 

@@ -118,14 +118,16 @@ export default {
       this.dialog = true;
     },
     async saveChange() {
+      console.log('SAVE CHANGES')
       this.dialog = false;
       try {
+        console.log('sending', [parseFloat(this.editedItem.lat), parseFloat(this.editedItem.long)])
         await axios.put(
           `http://localhost:5000/api/sessions/${this.$route.params.session_id}/`,
           {
             _id: this.editedItem._id,
             id: parseInt(this.editedItem.id),
-            coords: [this.editedItem.lat, this.editedItem.long],
+            coords: [parseFloat(this.editedItem.lat), parseFloat(this.editedItem.long)],
           }
         );
         Object.assign(
@@ -154,7 +156,7 @@ export default {
           {
             _id: this.editedItem._id,
             id: parseInt(this.editedItem.id),
-            coords: [this.editedItem.lat, this.editedItem.long],
+            coords: [parseFloat(this.editedItem.lat), parseFloat(this.editedItem.long)],
           }
         );
         this.beacons.push(Object.assign({}, this.editedItem));

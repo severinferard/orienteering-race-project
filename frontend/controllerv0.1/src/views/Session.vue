@@ -1,8 +1,16 @@
 <template>
   <v-main>
     <v-app-bar color="blue" dark app>
-      <v-icon large>mdi-chevron-left</v-icon>
-      <v-toolbar-title><span>Sessions</span> </v-toolbar-title>
+      <v-toolbar-title>
+        <router-link
+          :to="`/session/`"
+          class="text-decoration-none"
+          style="color: inherit"
+        >
+          <v-icon large>mdi-chevron-left</v-icon>
+          Sessions
+        </router-link>
+      </v-toolbar-title>
       <v-spacer></v-spacer>
       <span class="px-3">{{ sessionName }}</span>
       <v-btn text @click="settings = true"
@@ -12,9 +20,33 @@
     <v-container class="fill-height">
       <v-row align="center" justify="center">
         <v-col cols="4">
-          <v-card width="100%" max-height="400px" class="overflow-y-auto">
-            <v-list>
-              <v-subheader>{{ sessionName }}</v-subheader>
+          <v-card width="100%" height="400px" class="overflow-y-auto">
+            <v-toolbar color="deep-purple" dark>
+              <v-toolbar-title class="px-3">{{ sessionName }}</v-toolbar-title>
+              <v-toolbar-title class="px-3">{{ sessionDate }}</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-toolbar-title class="px-3">{{ beacons.length }} Balises</v-toolbar-title>
+            </v-toolbar>
+            <v-container v-if="loading" style="height: 80%">
+              <v-row
+                class="fill-height"
+                align-content="center"
+                justify="center"
+              >
+                <v-col class="subtitle-1 text-center" cols="12">
+                  Chargement...
+                </v-col>
+                <v-col cols="6">
+                  <v-progress-linear
+                    color="deep-purple accent-4"
+                    indeterminate
+                    rounded
+                    height="6"
+                  ></v-progress-linear>
+                </v-col>
+              </v-row>
+            </v-container>
+            <v-list v-else>
               <v-list-item-group>
                 <v-list-item>
                   <v-list-item-icon>
@@ -64,9 +96,6 @@
           </v-btn>
           <v-toolbar-title>{{ sessionName }} | Réglages</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-toolbar-items>
-            <v-btn dark text @click="dialog = false"> Save </v-btn>
-          </v-toolbar-items>
         </v-toolbar>
         <v-container>
           <v-card>
@@ -130,23 +159,18 @@
           </v-container>
         </v-card>
       </v-dialog>
-          <v-snackbar
-      v-model="snackbar"
-      :color="axiosSuccess ? 'success' : 'error'"
-    >
-      <span class="overline font-weight-black">{{snackbarMsg}}</span>
+      <v-snackbar
+        v-model="snackbar"
+        :color="axiosSuccess ? 'success' : 'error'"
+      >
+        <span class="overline font-weight-black">{{ snackbarMsg }}</span>
 
-      <template v-slot:action="{ attrs }">
-        <v-btn
-          color="white"
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
-          Fermer
-        </v-btn>
-      </template>
-    </v-snackbar>
+        <template v-slot:action="{ attrs }">
+          <v-btn color="white" text v-bind="attrs" @click="snackbar = false">
+            Fermer
+          </v-btn>
+        </template>
+      </v-snackbar>
     </v-dialog>
   </v-main>
 </template>
@@ -155,13 +179,14 @@
 import axios from "axios";
 // import SessionSettingsDialog from '@/components/SessionSettingsDialog.vue';
 export default {
-    components: {
-        // SessionSettingsDialog,
-    },
+  components: {
+    // SessionSettingsDialog,
+  },
   data() {
     return {
       students: [],
       sessionName: "",
+      sessionDate: "",
       settings: false,
       headers: [
         { text: "Balise ID", align: "start", value: "id" },
@@ -174,6 +199,7 @@ export default {
       editedIndex: -1,
       editedItem: { _id: "", id: "", lat: "", long: "" },
       modifie: false,
+      loading: true,
       snackbarMsg: "",
       snackbar: false,
       axiosSuccess: false,
@@ -194,6 +220,7 @@ export default {
         return { id: run.id };
       });
       this.sessionName = res.data.sessionName;
+      this.sessionDate = res.data.date;
       this.beacons = res.data.beacons.map((beacon) => {
         return {
           id: beacon.id,
@@ -202,6 +229,7 @@ export default {
           _id: beacon._id,
         };
       });
+      this.loading = false;
     },
     editBeacon(item) {
       console.log(item);
@@ -222,7 +250,10 @@ export default {
           {
             _id: this.editedItem._id,
             id: parseInt(this.editedItem.id),
-            coords: [this.editedItem.lat, this.editedItem.long],
+            coords: [
+              parseFloat(this.editedItem.lat),
+              parseFloat(this.editedItem.long),
+            ],
           }
         );
         Object.assign(
@@ -251,7 +282,10 @@ export default {
           {
             _id: this.editedItem._id,
             id: parseInt(this.editedItem.id),
-            coords: [this.editedItem.lat, this.editedItem.long],
+            coords: [
+              parseFloat(this.editedItem.lat),
+              parseFloat(this.editedItem.long),
+            ],
           }
         );
         this.beacons.push(Object.assign({}, this.editedItem));
@@ -272,9 +306,10 @@ export default {
       try {
         await axios.delete(
           `http://localhost:5000/api/sessions/${this.$route.params.session_id}/`,
-          { data: {_id: item._id} });
-          this.axiosSuccess = true;
-      this.snackbarMsg = "Balise suprimée avec succès!";
+          { data: { _id: item._id } }
+        );
+        this.axiosSuccess = true;
+        this.snackbarMsg = "Balise suprimée avec succès!";
         this.snackbar = true;
       } catch (error) {
         console.log(error);
