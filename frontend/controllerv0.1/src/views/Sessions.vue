@@ -102,7 +102,7 @@ export default {
       };
     },
     async loadData() {
-      const res = await axios.get(`http://localhost:5000/api/sessions/`);
+      const res = await axios.get(`/api/sessions/`);
       console.log(res.data);
       this.sessions = res.data;
       this.loading = false;
@@ -120,7 +120,7 @@ export default {
       };
       this.sessions.push(newSession);
       try {
-        const res = await axios.post(`http://localhost:5000/api/sessions/`, newSession);
+        const res = await axios.post(`/api/sessions/`, newSession);
         console.log(res);
       } catch (error) {
         console.log(error);

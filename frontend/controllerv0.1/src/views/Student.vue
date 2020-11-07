@@ -167,7 +167,7 @@ export default {
       this.loadingData = true;
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/runs/${this.$route.params.session_id}/${this.$route.params.student_id}`
+          `/api/runs/${this.$route.params.session_id}/${this.$route.params.student_id}`
         );
         const data = res.data;
         this.balises = data.beacons;

@@ -158,7 +158,7 @@ export default {
       };
     },
     async loadData() {
-      const res = await axios.get(`http://localhost:5000/api/sessions/${this.$route.params.session_id}`);
+      const res = await axios.get(`/api/sessions/${this.$route.params.session_id}`);
       console.log(res.data);
       this.students = res.data.runs.map((run) => {
         return { id: run.id };
@@ -189,7 +189,7 @@ export default {
     async saveChange() {
       this.dialog = false;
       try {
-        await axios.put(`http://localhost:5000/api/sessions/${this.$route.params.session_id}/`, {
+        await axios.put(`/api/sessions/${this.$route.params.session_id}/`, {
           _id: this.editedItem._id,
           id: parseInt(this.editedItem.id),
           coords: [parseFloat(this.editedItem.lat), parseFloat(this.editedItem.long)],
@@ -212,7 +212,7 @@ export default {
       this.dialog = false;
       this.editedItem._id = Math.random().toString(36).slice(-5);
       try {
-        await axios.post(`http://localhost:5000/api/sessions/${this.$route.params.session_id}/`, {
+        await axios.post(`/api/sessions/${this.$route.params.session_id}/`, {
           _id: this.editedItem._id,
           id: parseInt(this.editedItem.id),
           coords: [parseFloat(this.editedItem.lat), parseFloat(this.editedItem.long)],
@@ -233,7 +233,7 @@ export default {
       console.log("iteam to del", item);
       this.beacons.splice(this.beacons.indexOf(item), 1);
       try {
-        await axios.delete(`http://localhost:5000/api/sessions/${this.$route.params.session_id}/`, {
+        await axios.delete(`/api/sessions/${this.$route.params.session_id}/`, {
           data: { _id: item._id },
         });
         this.axiosSuccess = true;
