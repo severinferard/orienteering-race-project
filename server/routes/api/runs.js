@@ -44,11 +44,11 @@ router.post('/:session_id/:student_id', async (req, res) => {
     }
     sessions.updateOne(myquery, newvalues, options, (err, res) => {
       if (err) throw err
+      client.close()
     })
     res.status(200).send()
   } catch (error) {
     res.status(500).send()
-  } finally {
     client.close()
   }
 })

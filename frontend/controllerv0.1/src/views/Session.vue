@@ -15,7 +15,7 @@
       <v-row align="center" justify="center">
         <v-col cols="4">
           <v-card width="100%" height="400px" class="overflow-y-auto">
-            <v-toolbar color="deep-purple" dark>
+            <v-toolbar color="blue darken-3" dark>
               <v-toolbar-title class="px-3">{{ sessionName }}</v-toolbar-title>
               <v-spacer></v-spacer>
               <v-subheader class="px-3">{{ sessionDate }}</v-subheader>
@@ -25,7 +25,7 @@
               <v-row class="fill-height" align-content="center" justify="center">
                 <v-col class="subtitle-1 text-center" cols="12"> Chargement... </v-col>
                 <v-col cols="6">
-                  <v-progress-linear color="deep-purple accent-4" indeterminate rounded height="6"></v-progress-linear>
+                  <v-progress-linear color="blue accent-4" indeterminate rounded height="6"></v-progress-linear>
                 </v-col>
               </v-row>
             </v-container>
@@ -123,10 +123,8 @@
 
 <script>
 import axios from "axios";
-// import SessionSettingsDialog from '@/components/SessionSettingsDialog.vue';
 export default {
   components: {
-    // SessionSettingsDialog,
   },
   data() {
     return {
@@ -159,7 +157,6 @@ export default {
     },
     async loadData() {
       const res = await axios.get(`/api/sessions/${this.$route.params.session_id}`);
-      console.log(res.data);
       this.students = res.data.runs.map((run) => {
         return { id: run.id };
       });
@@ -176,7 +173,6 @@ export default {
       this.loading = false;
     },
     editBeacon(item) {
-      console.log(item);
       this.modifie = true;
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
@@ -208,7 +204,6 @@ export default {
     },
 
     async saveNew() {
-      console.log("new");
       this.dialog = false;
       this.editedItem._id = Math.random().toString(36).slice(-5);
       try {
@@ -230,7 +225,6 @@ export default {
       this.modifie = false;
     },
     async deleteItem(item) {
-      console.log("iteam to del", item);
       this.beacons.splice(this.beacons.indexOf(item), 1);
       try {
         await axios.delete(`/api/sessions/${this.$route.params.session_id}/`, {

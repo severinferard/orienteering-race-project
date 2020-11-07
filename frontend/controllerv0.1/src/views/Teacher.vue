@@ -90,7 +90,7 @@
                     <v-row justify="center" align="center">
                       <v-col cols="4">
                         <div>
-                          <v-tabs>
+                          <v-tabs fixed-tabs>
                             <v-tab @click="studentTabPlotType = 'time'" v-model="studentTabPlotType" key="time"
                               >Chrono</v-tab
                             >

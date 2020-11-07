@@ -2,7 +2,11 @@
   <v-main>
     <v-app-bar color="blue" dark>
       <v-toolbar-title>
-        <router-link :to="`/session/${sessionId}`" class="text-decoration-none" style="color: inherit">
+        <router-link
+          :to="`/session/${sessionId}`"
+          class="text-decoration-none"
+          style="color: inherit"
+        >
           <v-icon large>mdi-chevron-left</v-icon>
           {{ sessionName }}
         </router-link>
@@ -26,7 +30,12 @@
         <v-col cols="6">
           <v-row style="height: 100%">
             <v-col cols="4">
-              <StudentDataCard icon="mdi-timer" title="Chrono" unit="min" percent="100">
+              <StudentDataCard
+                icon="mdi-timer"
+                title="Chrono"
+                unit="min"
+                percent="100"
+              >
                 <template v-slot:value>
                   <span class="display-2">{{ Math.floor(chrono / 60) }}</span>
                   <span class="display-1">:</span>
@@ -57,7 +66,12 @@
         <v-col cols="6">
           <v-row style="height: 100%">
             <v-col>
-              <StudentGraphCard title="Vitesse" unit="km/h" :value="averageSpeed" icon="mdi-speedometer">
+              <StudentGraphCard
+                title="Vitesse"
+                unit="km/h"
+                :value="averageSpeed"
+                icon="mdi-speedometer"
+              >
                 <template v-slot:graph>
                   <v-sheet>
                     <v-sparkline
@@ -78,7 +92,13 @@
       <v-row
         ><v-col
           ><v-card>
-            <v-data-table :headers="headers" :items="balises" hide-default-footer fixed-header height="300px">
+            <v-data-table
+              :headers="headers"
+              :items="balises"
+              hide-default-footer
+              fixed-header
+              height="300px"
+            >
               <template v-slot:[`item.valided`]="{ item }">
                 <v-icon :color="item.valided ? 'green' : 'red'">{{
                   item.valided ? "mdi-checkbox-marked" : "mdi-close-box"
@@ -98,14 +118,20 @@
         ></v-row
       >
       <v-row>
-        <StudentFeedbackForm :rating="rating" :comment="comment" v-on:success="snackbar = true"></StudentFeedbackForm>
+        <StudentFeedbackForm
+          :rating="rating"
+          :comment="comment"
+          v-on:success="snackbar = true"
+        ></StudentFeedbackForm>
       </v-row>
     </div>
     <v-snackbar v-model="snackbar" color="success">
       <span class="overline font-weight-black">Enregistré !</span>
 
       <template v-slot:action="{ attrs }">
-        <v-btn color="white" text v-bind="attrs" @click="snackbar = false"> Fermer </v-btn>
+        <v-btn color="white" text v-bind="attrs" @click="snackbar = false">
+          Fermer
+        </v-btn>
       </template>
     </v-snackbar>
   </v-main>

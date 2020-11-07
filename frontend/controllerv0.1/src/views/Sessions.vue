@@ -7,7 +7,7 @@
       <v-row align="center" justify="center">
         <v-col cols="4">
           <v-card width="100%" height="400px" class="overflow-y-auto">
-            <v-toolbar color="deep-purple" dark>
+            <v-toolbar color="blue darken-3" dark>
               <v-toolbar-title>Sessions</v-toolbar-title>
               <v-btn @click.stop="newSession" absolute bottom color="white" fab right light>
                 <v-icon>mdi-plus</v-icon></v-btn
@@ -17,16 +17,13 @@
               <v-row class="fill-height" align-content="center" justify="center">
                 <v-col class="subtitle-1 text-center" cols="12"> Chargement... </v-col>
                 <v-col cols="6">
-                  <v-progress-linear color="deep-purple accent-4" indeterminate rounded height="6"></v-progress-linear>
+                  <v-progress-linear color="blue accent-4" indeterminate rounded height="6"></v-progress-linear>
                 </v-col>
               </v-row>
             </v-container>
             <v-list v-else>
               <v-list-item-group>
                 <v-list-item v-for="sess in sessions" :key="sess.sessionId" :to="makeLink(sess.sessionId)">
-                  <v-list-item-icon>
-                    <v-icon>mdi-school</v-icon>
-                  </v-list-item-icon>
                   <v-list-item-content>
                     {{ sess.sessionName }}
                   </v-list-item-content>
