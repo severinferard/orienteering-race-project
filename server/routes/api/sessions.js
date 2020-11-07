@@ -140,11 +140,3 @@ router.delete("/:session_id", async (req, res) => {
     client.close();
   }
 });
-
-async function loadRunsCollection() {
-  const client = await mongodb.MongoClient.connect("mongodb://localhost:27017", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  return client.db("orienteering-race-project").collection("sessions");
-}

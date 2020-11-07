@@ -11,10 +11,12 @@ app.use(cors());
 const sessions = require('./routes/api/sessions');
 const runs = require('./routes/api/runs');
 const upload = require('./routes/api/upload');
+const teacher = require('./routes/api/teacher');
 
 app.use('/api/sessions', sessions);
 app.use('/api/runs', runs);
 app.use('/api/upload', upload)
+app.use('/api/teacher', teacher)
 
 app.listen(5000, () => console.log('Server running on port 5000'))
 

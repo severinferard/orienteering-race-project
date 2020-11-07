@@ -32,6 +32,32 @@ class GeoJsonLoader {
         return ret;
   }
 
+  static getTeacherMarkers(data) {
+      return data.beacons.map(beacon => {
+        return {
+          type: "Feature",
+          properties: {id: beacon.id},
+          geometry: {
+            type: "Point",
+            coordinates: beacon.coords,
+          },
+        };
+      });
+    }
+
+  static getTeacherLines(data) {
+    return data.runs.map(run => {
+      return {
+        "type": "Feature",
+        "properties": {id: run.id},
+        "geometry": {
+          "type": "LineString",
+          "coordinates": run.rawPositions
+        }
+      }
+    })
+  }
+
   static createGeoJson(data) {
       let featureCollection = {
         "type": "FeatureCollection",
@@ -41,6 +67,16 @@ class GeoJsonLoader {
       let lines = GeoJsonLoader.getLines(data);
       featureCollection.features = featureCollection.features.concat(markers, lines);
       return featureCollection;
+  }
+  static createTeacherGeoJson(data) {
+    let featureCollection = {
+      "type": "FeatureCollection",
+      "features": []
+    };
+    let markers = GeoJsonLoader.getTeacherMarkers(data);
+    let lines = GeoJsonLoader.getTeacherLines(data);
+    featureCollection.features = featureCollection.features.concat(markers, lines);
+    return featureCollection;
   }
 };
 

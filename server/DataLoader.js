@@ -1,8 +1,7 @@
-const turfDistance = require('turf-distance');
+const turfDistance = require("turf-distance");
 
 class DataLoader {
-    
-static getGeoJsonPointsFromCoords(coords) {
+  static getGeoJsonPointsFromCoords(coords) {
     return coords.map((coord) => {
       return {
         type: "Feature",
@@ -23,11 +22,11 @@ static getGeoJsonPointsFromCoords(coords) {
   }
 
   static getDistanceFromPoints(points) {
-    let dists =  points.map((point, index) => {
-        if (index === 0) return 0;
-        return turfDistance(point, points[index - 1]) * 1000;
-      });
-      return dists.reduce((a, b) => a + b);
+    let dists = points.map((point, index) => {
+      if (index === 0) return 0;
+      return turfDistance(point, points[index - 1]) * 1000;
+    });
+    return dists.reduce((a, b) => a + b);
   }
 
   static getAverageSpeed(speeds) {
@@ -53,16 +52,10 @@ static getGeoJsonPointsFromCoords(coords) {
     });
     points.forEach((point, pi) => {
       mybeacons.forEach((beacon) => {
-        if (
-          !beacon.valided &&
-          turfDistance(point, beacon.coords) * 1000 < beaconRange
-        ) {
+        if (!beacon.valided && turfDistance(point, beacon.coords) * 1000 < beaconRange) {
           let lastValided = DataLoader.getLastValidedBeacon(mybeacons);
-          let _speeds = speeds.slice(
-            lastValided.time / sampleRate - 1 || 0,
-            pi + 1
-          );
-        //   console.log("_speed", _speeds);
+          let _speeds = speeds.slice(lastValided.time / sampleRate - 1 || 0, pi + 1);
+          //   console.log("_speed", _speeds);
           beacon.avgSpeed = _speeds.reduce((a, b) => a + b) / _speeds.length;
           beacon.valided = true;
           beacon.time = pi * sampleRate + 1;
@@ -74,13 +67,25 @@ static getGeoJsonPointsFromCoords(coords) {
   }
 
   static getTime(points, sampleRate) {
-      return points.length / sampleRate
+    return points.length / sampleRate;
+  }
+
+  static getBeaconSuccess(session, beaconID) {
+    console.log("beaconID", beaconID)
+    let count = 0;
+    session.runs.forEach((run) => {
+      try {
+        if (run.beacons.filter((beacon) => beacon.id === beaconID)[0].valided) {
+          count++;
+        }
+      } catch (error) {}
+      
+    });
+    return (count / session.runs.length) * 100;
   }
 }
 
-module.exports = DataLoader
-
-
+module.exports = DataLoader;
 
 // let rawPositions = [
 //     [ 48.83842089934189, 2.200108766555786 ],
@@ -152,7 +157,7 @@ module.exports = DataLoader
 //     [ 48.83835381451083, 2.2001034021377563 ]
 //   ]
 // let rawData = {id: "mov12", firmwareVersion: 0.1, data: rawPositions, sampleRate: 1}
-// // console.log(rawPositions) 
+// // console.log(rawPositions)
 // let beacons = [{"_id":"7fjhb33","id":1,"name":"","coords":[48.838426, 2.200067]},{"_id":"6fgcv8","id":2,"name":"","coords":[48.838352,2.203357]},{"_id":"fcj876hj","id":3,"name":"","coords":[48.839387,2.19841]},{"_id":"56gvjny7","id":4,"name":"","coords":[48.839224,2.203405]},{"_id":"45dfVU7","id":5,"name":"","coords":[48.837686,2.200015]},{"_id":"yg57n7","id":6,"name":"","coords":[48.837518,2.20278]},{"_id":"7Jgy57","id":7,"name":"","coords":[48.839373,2.200848]},{"_id":"dxfc4ug","id":8,"name":"","coords":[48.838423,2.198175]},{"_id":"(65guvbu8)","id":9,"name":"","coords":[48.838866,2.20234]}]
 // let sampleRate = 1;
 // let beaconRange = 10;
