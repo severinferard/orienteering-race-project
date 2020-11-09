@@ -117,7 +117,7 @@ export default {
 
 .custom-div-icon .id {
   position: absolute;
-  width: 22px;
+
   font-size: 22px;
   left: 0;
   right: 0;

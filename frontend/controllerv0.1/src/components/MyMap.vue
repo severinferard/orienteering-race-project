@@ -4,7 +4,6 @@
 
 <script>
 import "leaflet/dist/leaflet.css";
-// import { rainbow } from "rainbowvis.js"
 var Rainbow = require("rainbowvis.js");
 import L from "leaflet";
 export default {

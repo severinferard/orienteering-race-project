@@ -19,7 +19,6 @@
     "vue": "^2.6.11",
     "vue-plotly": "^1.1.0",
     "vue-router": "^3.2.0",
-    "vue2-leaflet": "^2.6.0",
     "vuetify": "^2.2.11"
   },
   "devDependencies": {

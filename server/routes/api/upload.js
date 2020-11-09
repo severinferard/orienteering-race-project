@@ -27,17 +27,17 @@ router.post('/', async (req, res) => {
     id: rawData.id,
     firmwareVersion: rawData.firmwareVersion,
     sampleRate: rawData.sampleRate,
-    beacons: checkedBeacons,
+    // beacons: [],
     rawPositions: rawData.data,
-    speeds: speeds,
-    avgSpeed: avgSpeed,
-    distance: distance,
-    time: time,
+    // speeds: [],
+    // avgSpeed: null,
+    // distance: null,
+    // time: null,
     comment: '',
     rating: null
   }
-  const geoJson = GeoJsonLoader.createGeoJson(obj)
-  obj.geoJon = geoJson
+  // const geoJson = GeoJsonLoader.createGeoJson(obj)
+  // obj.geoJon = geoJson
   sessions.updateOne({ _id: currentSession._id }, { $push: { runs: obj } })
   res.sendStatus(200)
 })

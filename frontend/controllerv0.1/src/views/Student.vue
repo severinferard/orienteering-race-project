@@ -205,7 +205,8 @@ export default {
         this.speeds = data.speeds;
         this.comment = data.comment;
         this.rating = data.rating;
-        this.geoJson = data.geoJon;
+        this.geoJson = data.geoJson;
+        console.log("geosJson",this.geoJson)
         this.mapCenter = data.beacons[0].coords;
       } catch (error) {
         this.loadingError = true;

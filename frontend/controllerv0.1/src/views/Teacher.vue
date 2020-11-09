@@ -88,7 +88,7 @@
                 <div style="height: 500px; overflow: scroll">
                   <v-toolbar>
                     <v-row justify="center" align="center">
-                      <v-col cols="4">
+                      <v-col cols="7">
                         <div>
                           <v-tabs fixed-tabs>
                             <v-tab @click="studentTabPlotType = 'time'" v-model="studentTabPlotType" key="time"
@@ -123,6 +123,9 @@
                   fixed-header
                   height="500px"
                 >
+                <template v-slot:[`item.time`]="{item}">
+                    {{Math.floor(item.time/60)}}:{{getMins(item.time)}}
+                </template>
                 </v-data-table>
               </v-tab-item>
             </v-tabs-items>
@@ -232,28 +235,7 @@ export default {
             t: 0,
             pad: 4,
           },
-        },
-      };
-    },
-    createStudentPlot() {
-      this.studentPlotData = {
-        data: [
-          {
-            x: this.students.map((std) => std.id),
-            y: this.students.map((std) => std.time),
-            name: "Chrono",
-            type: "bar",
-          },
-        ],
-        layout: {
-          height: 600,
-          margin: {
-            l: 50,
-            r: 50,
-            b: 40,
-            t: 0,
-            pad: 4,
-          },
+          xaxis: {tickmode:'linear'}
         },
       };
     },

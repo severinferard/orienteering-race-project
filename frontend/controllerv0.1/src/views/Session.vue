@@ -162,6 +162,7 @@ export default {
       });
       this.sessionName = res.data.sessionName;
       this.sessionDate = res.data.date;
+      console.log('beacons', res.data.beacons)
       this.beacons = res.data.beacons.map((beacon) => {
         return {
           id: beacon.id,

@@ -35,7 +35,7 @@ class DataLoader {
 
   static getLastValidedBeacon (beacons) {
     if (beacons.filter((b) => b.valided).length === 0) return 0
-    return beacons.filter((b) => b.valided).sort((a, b) => a.time < b.time)[0]
+    return beacons.filter((b) => b.valided).sort((x, y) => x.time - y.time)[beacons.filter((b) => b.valided).length - 1]
   }
 
   static evaluateBeacons (points, beacons, beaconRange, speeds, sampleRate) {
