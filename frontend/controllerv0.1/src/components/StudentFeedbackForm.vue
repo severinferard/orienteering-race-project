@@ -59,7 +59,7 @@ export default {
       console.log("send");
       try {
         await axios.post(
-          `http://localhost:5000/api/runs/${this.$route.params.session_id}/${this.$route.params.student_id}`,
+          `/api/runs/${this.$route.params.session_id}/${this.$route.params.student_id}`,
           {
             comment: this.newComment,
             rating: this.newRating,
