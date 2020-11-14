@@ -5,16 +5,17 @@ const router = express.Router()
 module.exports = router
 
 router.get('/', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb+srv://dbUser:dbUserPassword@cluster0.fr7ka.mongodb.net/', {
+  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
   try {
     const sessions = client.db('orienteering-race-project').collection('sessions')
-    const list = await sessions.find({}).toArray()
+    const list = await sessions.find({"class_id" : mongodb.ObjectID(req.query.class_id)}).toArray()
     list.forEach((v) => {
       delete v.runs
       delete v.geosJon
+      v.id = v._id
     })
     res.send(list)
   } catch (error) {
@@ -25,15 +26,16 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb+srv://dbUser:dbUserPassword@cluster0.fr7ka.mongodb.net/', {
+  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
   try {
     const sessions = client.db('orienteering-race-project').collection('sessions')
     const newSession = {
+      class_id: mongodb.ObjectID(req.query.class_id),
       sessionName: req.body.sessionName,
-      sessionId: Math.random().toString(36).slice(-5),
+      _id: mongodb.ObjectID(),
       date: req.body.date,
       beacons: [],
       runs: []
@@ -50,13 +52,17 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/:session_id', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb+srv://dbUser:dbUserPassword@cluster0.fr7ka.mongodb.net/', {
+  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
   try {
     const sessions = client.db('orienteering-race-project').collection('sessions')
-    res.send(await sessions.findOne({ sessionId: req.params.session_id }))
+    const schools = client.db('orienteering-race-project').collection('schools')
+    const session = await sessions.findOne({ _id: mongodb.ObjectID(req.params.session_id) })
+    const school = await schools.findOne({ classes: {$elemMatch: {_id: mongodb.ObjectID(session.class_id)}}})
+    session.schoolId = school._id
+    res.send(session)
   } catch (error) {
     console.log(error)
   } finally {
@@ -65,13 +71,13 @@ router.get('/:session_id', async (req, res) => {
 })
 
 router.put('/:session_id', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb+srv://dbUser:dbUserPassword@cluster0.fr7ka.mongodb.net/', {
+  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
   try {
     const sessions = client.db('orienteering-race-project').collection('sessions')
-    const myquery = { sessionId: req.params.session_id }
+    const myquery = { _id: mongodb.ObjectID(req.params.session_id) }
     const data = {
       _id: req.body._id,
       id: req.body.id,
@@ -94,13 +100,13 @@ router.put('/:session_id', async (req, res) => {
 })
 
 router.post('/:session_id', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb+srv://dbUser:dbUserPassword@cluster0.fr7ka.mongodb.net/', {
+  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
   try {
     const sessions = client.db('orienteering-race-project').collection('sessions')
-    const myquery = { sessionId: req.params.session_id }
+    const myquery = { _id: mongodb.ObjectID(req.params.session_id) }
     const data = {
       _id: req.body._id,
       id: req.body.id,
@@ -120,13 +126,13 @@ router.post('/:session_id', async (req, res) => {
 })
 
 router.delete('/:session_id', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb+srv://dbUser:dbUserPassword@cluster0.fr7ka.mongodb.net/', {
+  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
   try {
     const sessions = client.db('orienteering-race-project').collection('sessions')
-    const myquery = { sessionId: req.params.session_id }
+    const myquery = { _id: mongodb.ObjectID(req.params.session_id) }
     const data = { _id: req.body._id }
     const action = { $pull: { beacons: { _id: data._id } } }
     sessions.updateOne(myquery, action, (err, res) => {

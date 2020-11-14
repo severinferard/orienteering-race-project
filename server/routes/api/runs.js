@@ -9,13 +9,13 @@ module.exports = router
 // Get student data
 router.get('/:session_id/:student_id', async (req, res) => {
   console.log('get runs')
-  const client = await mongodb.MongoClient.connect('mongodb+srv://dbUser:dbUserPassword@cluster0.fr7ka.mongodb.net/', {
+  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
   try {
     const sessions = client.db('orienteering-race-project').collection('sessions')
-    const session = (await sessions.find({ sessionId: req.params.session_id }).toArray())[0]
+    const session = (await sessions.find({ _id: mongodb.ObjectID(req.params.session_id) }).toArray())[0]
     const run = session.runs.filter((run) => run.id === req.params.student_id)[0]
     const sessionBeacons = session.beacons
     const beaconRange = 10

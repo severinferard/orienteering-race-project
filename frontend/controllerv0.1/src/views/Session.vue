@@ -2,7 +2,7 @@
   <v-main>
     <v-app-bar color="blue" dark app>
       <v-toolbar-title>
-        <router-link :to="`/session/`" class="text-decoration-none" style="color: inherit">
+        <router-link :to="`/schools/${schoolId}/classes/${classId}/sessions`" class="text-decoration-none" style="color: inherit">
           <v-icon large>mdi-chevron-left</v-icon>
           Sessions
         </router-link>
@@ -13,7 +13,7 @@
     </v-app-bar>
     <v-container class="fill-height">
       <v-row align="center" justify="center">
-        <v-col cols="4">
+        <v-col cols="8">
           <v-card width="100%" height="400px" class="overflow-y-auto">
             <v-toolbar color="blue darken-3" dark>
               <v-toolbar-title class="px-3">{{ sessionName }}</v-toolbar-title>
@@ -128,6 +128,8 @@ export default {
   },
   data() {
     return {
+      schoolId: "",
+      classId: "",
       students: [],
       sessionName: "",
       sessionDate: "",
@@ -157,9 +159,12 @@ export default {
     },
     async loadData() {
       const res = await axios.get(`/api/sessions/${this.$route.params.session_id}`);
+      console.log(res.data)
       this.students = res.data.runs.map((run) => {
         return { id: run.id };
       });
+      this.schoolId = res.data.schoolId
+      this.classId = res.data.class_id
       this.sessionName = res.data.sessionName;
       this.sessionDate = res.data.date;
       console.log('beacons', res.data.beacons)

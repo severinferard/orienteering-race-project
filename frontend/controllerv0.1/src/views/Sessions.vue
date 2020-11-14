@@ -1,11 +1,14 @@
 <template>
   <v-main>
     <v-app-bar color="blue" dark app>
-      <v-toolbar-title><span>Sessions</span> </v-toolbar-title>
+      <v-toolbar-title><router-link :to="`/schools/${schoolId}/classes`" class="text-decoration-none" style="color: inherit">
+        <v-icon large>mdi-chevron-left</v-icon>
+        Classes
+        </router-link></v-toolbar-title>
     </v-app-bar>
     <v-container class="fill-height">
       <v-row align="center" justify="center">
-        <v-col cols="4">
+        <v-col cols="8">
           <v-card width="100%" height="400px" class="overflow-y-auto">
             <v-toolbar color="blue darken-3" dark>
               <v-toolbar-title>Sessions</v-toolbar-title>
@@ -23,7 +26,7 @@
             </v-container>
             <v-list v-else>
               <v-list-item-group>
-                <v-list-item v-for="sess in sessions" :key="sess.sessionId" :to="makeLink(sess.sessionId)">
+                <v-list-item v-for="sess in sessions" :key="sess.id" :to="makeLink(sess.id)">
                   <v-list-item-content>
                     {{ sess.sessionName }}
                   </v-list-item-content>
@@ -82,6 +85,7 @@ export default {
     return {
       sessions: [{ id: 1, name: "name" }],
       loading: true,
+      schoolId: this.$route.params.school_id,
       dialog: false,
       newItem: {},
       dateMenu: false,
@@ -99,7 +103,7 @@ export default {
       };
     },
     async loadData() {
-      const res = await axios.get(`/api/sessions/`);
+      const res = await axios.get(`/api/sessions/`, {params: {class_id: this.$route.params.class_id}});
       console.log(res.data);
       this.sessions = res.data;
       this.loading = false;
@@ -117,7 +121,7 @@ export default {
       };
       this.sessions.push(newSession);
       try {
-        const res = await axios.post(`/api/sessions/`, newSession);
+        const res = await axios.post(`/api/sessions/`,newSession, {params: {class_id: this.$route.params.class_id}});
         console.log(res);
       } catch (error) {
         console.log(error);

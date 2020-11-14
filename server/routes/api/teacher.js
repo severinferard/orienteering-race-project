@@ -7,13 +7,13 @@ const router = express.Router()
 module.exports = router
 
 router.get('/:session_id', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb+srv://dbUser:dbUserPassword@cluster0.fr7ka.mongodb.net/', {
+  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
   try {
     const sessions = client.db('orienteering-race-project').collection('sessions')
-    const session = (await sessions.find({ sessionId: req.params.session_id }).toArray())[0]
+    const session = (await sessions.find({ _id: mongodb.ObjectID(req.params.session_id) }).toArray())[0]
     const sessionBeacons = session.beacons
     const beaconRange = 10
     session.runs.forEach(run => {

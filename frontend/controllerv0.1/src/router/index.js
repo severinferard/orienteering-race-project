@@ -5,6 +5,8 @@ import StudentPage from '../views/Student.vue'
 import SessionPage from '../views/Session.vue'
 import SessionsPage from '../views/Sessions.vue'
 import TeacherPage from '../views/Teacher.vue'
+import SchoolsPage from '../views/Schools.vue'
+import ClassesPage from '../views/Classes.vue'
 
 import 'leaflet/dist/leaflet.css';
 
@@ -17,14 +19,6 @@ const routes = [
     component: Home
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  },
-  {
     path: '/session/:session_id',
     name: 'Session',
     component: SessionPage
@@ -34,6 +28,25 @@ const routes = [
     name: 'Sessions',
     component: SessionsPage
   },
+
+
+  {
+    path: '/schools/',
+    name: 'Schools selection',
+    component: SchoolsPage
+  },
+  {
+    path: '/schools/:school_id/classes',
+    name: 'Class selection',
+    component: ClassesPage
+  },
+  {
+    path: '/schools/:school_id/classes/:class_id/sessions',
+    name: 'Session selection',
+    component: SessionsPage
+  },
+
+  
   {
     path: '/session/:session_id/student-recap/:student_id',
     name: 'Student recap',
@@ -43,7 +56,7 @@ const routes = [
     path: '/session/:session_id/teacher-recap/',
     name: 'teacher recap',
     component: TeacherPage
-  },
+  }
 ]
 
 const router = new VueRouter({
