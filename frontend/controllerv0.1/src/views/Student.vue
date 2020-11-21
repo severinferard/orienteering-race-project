@@ -26,7 +26,7 @@
       <MyMap ref="myMap" :geoJson="geoJson" :center="mapCenter"> </MyMap>
     </v-card>
     <div class="pt-0 pl-0 mx-5">
-      <v-row height="300px">
+      <!-- <v-row height="300px">
         <v-col cols="6">
           <v-row style="height: 100%">
             <v-col cols="4">
@@ -88,7 +88,7 @@
             </v-col>
           </v-row>
         </v-col>
-      </v-row>
+      </v-row> -->
       <v-row
         ><v-col
           ><v-card>
@@ -140,14 +140,14 @@
 <script>
 import axios from "axios";
 import MyMap from "@/components/MyMap.vue";
-import StudentDataCard from "@/components/StudentDataCard.vue";
-import StudentGraphCard from "@/components/StudentGraphCard.vue";
+// import StudentDataCard from "@/components/StudentDataCard.vue";
+// import StudentGraphCard from "@/components/StudentGraphCard.vue";
 import StudentFeedbackForm from "@/components/StudentFeedbackForm.vue";
 export default {
   components: {
     MyMap,
-    StudentDataCard,
-    StudentGraphCard,
+    // StudentDataCard,
+    // StudentGraphCard,
     StudentFeedbackForm,
   },
   data() {
@@ -223,6 +223,6 @@ export default {
 
 <style lang="css">
 .map-wrapper {
-  height: 80%;
+  height: 100%;
 }
 </style>

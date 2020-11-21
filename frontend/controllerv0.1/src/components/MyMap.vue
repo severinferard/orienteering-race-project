@@ -14,12 +14,32 @@
     </div>
     <div class="ui-overlay" id="bar">
       <v-row justify="center">
-        <div style="width: 80%; height: 50px;">
-          <StudentDataBar title="Balises" :value="12" color="#ff9900" :percent="60" :left="true"></StudentDataBar>
-          <StudentDataBar class="mt-3" title="Chrono" :value="'12:09'" color="blue" :percent="89"></StudentDataBar>
+        <div style="width: 80%; height: 50px">
+          <StudentDataBar
+            title="Balises"
+            :value="12"
+            color="#ff9900"
+            :percent="60"
+            :left="true"
+          ></StudentDataBar>
+          <StudentDataBar
+            class="mt-3"
+            title="Chrono"
+            :value="'12:09'"
+            color="blue"
+            :percent="89"
+          ></StudentDataBar>
         </div>
-        <!-- <StudentDataBar></StudentDataBar> -->
       </v-row>
+    </div>
+    <div class="ui-overlay" id="graph">
+      <!-- <StudentGraphCard
+        title="Vitesse"
+        unit="km/h"
+        :value="10"
+        icon="mdi-speedometer"
+      >
+      </StudentGraphCard> -->
     </div>
   </div>
 </template>
@@ -30,12 +50,14 @@ var Rainbow = require("rainbowvis.js");
 import L from "leaflet";
 import StudentDataCard from "@/components/StudentDataCard.vue";
 import StudentDataBar from "@/components/StudentDataBar.vue";
-import image from '@/assets/logo.png'
+// import StudentGraphCard from "@/components/StudentGraphCard.vue";
+// import image from '@/assets/logo.png'
 
 export default {
   components: {
     StudentDataCard,
     StudentDataBar,
+    // StudentGraphCard,
   },
   props: ["geoJson", "center"],
   data() {
@@ -87,24 +109,24 @@ export default {
         iconAnchor: [15, 42],
       });
 
-      // let iconNotValided = L.divIcon({
-      //   className: "custom-div-icon",
-      //   html:
-      //     "<div class='marker-pin-not-valided'></div><i class='material-icons'>close-box</i>",
-      //   iconSize: [30, 42],
-      //   iconAnchor: [15, 42],
-      //   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+      let iconNotValided = L.divIcon({
+        className: "custom-div-icon",
+        html:
+          "<div class='marker-pin-not-valided'></div><i class='material-icons'>close-box</i>",
+        iconSize: [30, 42],
+        iconAnchor: [15, 42],
+        shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+      });
+
+      //       let iconNotValided = L.icon({
+      //     iconUrl: image,
+
+      //     iconSize:     [38, 95], // size of the icon
+      //     shadowSize:   [50, 64], // size of the shadow
+      //     iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+      //     shadowAnchor: [4, 62],  // the same for the shadow
+      //     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
       // });
-
-      let iconNotValided = L.icon({
-    iconUrl: image,
-
-    iconSize:     [38, 95], // size of the icon
-    shadowSize:   [50, 64], // size of the shadow
-    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-    shadowAnchor: [4, 62],  // the same for the shadow
-    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-});
 
       let rainbowvis = new Rainbow();
       rainbowvis.setNumberRange(0, 10);
@@ -171,6 +193,11 @@ export default {
 #bar {
   bottom: 150px;
   width: 100%;
+}
+
+#graph {
+  top: 40px;
+  right: 40px;
 }
 
 #map {
