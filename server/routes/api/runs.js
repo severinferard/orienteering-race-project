@@ -37,19 +37,22 @@ router.get('/:session_id/:student_id', async (req, res) => {
 
 // Store comment and rating
 router.post('/:session_id/:student_id', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb+srv://dbUser:dbUserPassword@cluster0.fr7ka.mongodb.net/', {
+	console.log(req.body);
+  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
   try {
     const sessions = client.db('orienteering-race-project').collection('sessions')
-    const myquery = { sessionId: req.params.session_id }
+	const myquery = { _id: mongodb.ObjectID(req.params.session_id) }
+	console.log("query", myquery);
     const newvalues = {
       $set: {
         'runs.$[run].comment': req.body.comment,
         'runs.$[run].rating': req.body.rating
       }
-    }
+	}
+	console.log("student_id",req.params.student_id)
     const options = {
       arrayFilters: [{ 'run.id': req.params.student_id }]
     }
