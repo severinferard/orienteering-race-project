@@ -18,12 +18,10 @@
         </v-col>
         <v-col></v-col>
         <v-col cols="5" class="text-center">
-          <v-rating
-            v-model="newRating"
-            background-color="primary lighten-3"
-            color="primary"
-            large
-          ></v-rating>
+          <SmileyRating 
+              v-bind:value="newRating"
+              v-on:input="newRating = $event">
+            </SmileyRating>
         </v-col>
       </v-row>
       <v-card-actions class="justify-center"
@@ -37,7 +35,11 @@
 
 <script>
 import axios from "axios";
+import SmileyRating from "@/components/SmileyRating.vue"
 export default {
+    components: {
+        SmileyRating
+    },
   props: ["rating", "comment"],
   data() {
     return {

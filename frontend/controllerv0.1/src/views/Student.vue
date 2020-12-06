@@ -195,7 +195,8 @@ export default {
         const res = await axios.get(
           `/api/runs/${this.$route.params.session_id}/${this.$route.params.student_id}`
         );
-        const data = res.data;
+		const data = res.data;
+		console.log("data", data);
         this.balises = data.beacons;
         this.sessionName = data.sessionName;
         this.id = data.id;
@@ -204,7 +205,8 @@ export default {
         this.distance = data.distance.toFixed();
         this.speeds = data.speeds;
         this.comment = data.comment;
-        this.rating = data.rating;
+		this.rating = data.rating;
+		console.log("original rating", this.rating)
         this.geoJson = data.geoJson;
         console.log("geosJson",this.geoJson)
         this.mapCenter = data.beacons[0].coords;

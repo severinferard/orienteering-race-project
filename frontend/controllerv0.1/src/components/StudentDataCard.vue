@@ -1,13 +1,13 @@
 <template>
-  <v-card height="100%" color="rgba(0,199,200, 0.3)">
+  <v-card height="100%" class="px-3" color="rgba(0,199,200, 0.3)">
     <v-row style="height: 200px">
       <v-col
         ><v-card-actions class="justify-center">
           <v-progress-circular
             :rotate="360"
             :size="150"
-            :width="5"
-            :value="67"
+            :width="10"
+            :value="percent"
             color="blue"
           >
             <v-container fluid class="pt-7" style="color: #fff">
@@ -24,9 +24,9 @@
           <div style="position: absolute">
             <v-progress-circular
               :rotate="20"
-              :size="160"
-              :width="4"
-              :value="67"
+              :size="166"
+              :width="8"
+              :value="percent"
               color="#fff"
             ></v-progress-circular>
           </div>
@@ -34,7 +34,7 @@
             <v-progress-circular
               :rotate="300"
               :size="130"
-              :width="2"
+              :width="4"
               indeterminate
               :value="67"
               color="#ff9900"
@@ -45,8 +45,8 @@
     <v-row
       ><v-col>
         <v-card-actions class="justify-center"
-          ><span style="color: #fff; font-size: 20px" class="mandalore"
-            >{{ title }} ({{ unit }})</span
+          ><span style="color: #fff; font-size: 25px" class="mandalore"
+            >{{ title }} {{ unit ? '(' + unit + ')' : "" }}</span
           ></v-card-actions
         ></v-col
       ></v-row

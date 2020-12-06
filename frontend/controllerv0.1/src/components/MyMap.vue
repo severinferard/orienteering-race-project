@@ -4,11 +4,20 @@
     <div class="ui-overlay" id="left-meter">
       <v-card flat color="transparent" width="100%">
         <StudentDataCard
-          icon="mdi-shoe-print"
-          :value="70"
+          :value="distance"
           percent="100"
           title="Distance"
           unit="m"
+        ></StudentDataCard>
+      </v-card>
+    </div>
+    <div class="ui-overlay" id="right-meter">
+      <v-card flat color="transparent" width="100%">
+        <StudentDataCard
+          :value="(chrono / 60).toFixed() + ':' + (chrono % 60).toFixed()"
+          percent="100"
+          title="Chrono"
+          :unit="null"
         ></StudentDataCard>
       </v-card>
     </div>
@@ -17,17 +26,10 @@
         <div style="width: 80%; height: 50px">
           <StudentDataBar
             title="Balises"
-            :value="12"
+            :value="beacons.filter((b) => b.valided).length"
             color="#ff9900"
-            :percent="60"
+            :percent="(beacons.filter((b) => b.valided).length / beacons.length) * 100"
             :left="true"
-          ></StudentDataBar>
-          <StudentDataBar
-            class="mt-3"
-            title="Chrono"
-            :value="'12:09'"
-            color="blue"
-            :percent="89"
           ></StudentDataBar>
         </div>
       </v-row>
@@ -46,6 +48,7 @@
 
 <script>
 import "leaflet/dist/leaflet.css";
+import axios from "axios";
 var Rainbow = require("rainbowvis.js");
 import L from "leaflet";
 import StudentDataCard from "@/components/StudentDataCard.vue";
@@ -59,20 +62,17 @@ export default {
     StudentDataBar,
     // StudentGraphCard,
   },
-  props: ["geoJson", "center"],
+  props: ["center"],
   data() {
     return {
       map: null,
+      averageSpeed: 0,
+      distance: 0,
+      chrono: 0,
+      speeds: [],
+      beacons: [],
+      mapCenter: []
     };
-  },
-  watch: {
-    geoJson: function (newval) {
-      this.addGeoJson(newval);
-    },
-    center: function (newval) {
-      console.log("center", newval);
-      this.map.setView([newval[1], newval[0]], 16);
-    },
   },
   methods: {
     setupLeaflet() {
@@ -165,6 +165,33 @@ export default {
         },
       }).addTo(this.map);
     },
+    async loadData() {
+      this.loadingData = true;
+      try {
+        const res = await axios.get(
+          `/api/runs/${this.$route.params.session_id}/${this.$route.params.student_id}`
+        );
+        const data = res.data;
+        console.log("data", data);
+        this.beacons = data.beacons;
+        this.id = data.id;
+        this.chrono = data.time;
+        this.averageSpeed = data.avgSpeed.toFixed(1);
+        this.distance = data.distance.toFixed();
+        this.speeds = data.speeds;
+        this.geoJson = data.geoJson;
+        console.log("geosJson", this.geoJson);
+        this.mapCenter = data.beacons[0].coords;
+        this.addGeoJson(this.geoJson);
+        this.map.setView([this.mapCenter[1], this.mapCenter[0]], 16)
+      } catch (error) {
+        console.log(error);
+      }
+      this.loadingData = false;
+    },
+  },
+  created() {
+      this.loadData();
   },
   mounted() {
     this.setupLeaflet();
@@ -190,8 +217,14 @@ export default {
   height: 0;
 }
 
+#right-meter {
+  top: 40px;
+  right: 40px;
+  height: 0;
+}
+
 #bar {
-  bottom: 150px;
+  bottom: 75px;
   width: 100%;
 }
 
