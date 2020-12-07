@@ -11,13 +11,21 @@ router.get('/', async (req, res) => {
   })
   try {
     const sessions = client.db('orienteering-race-project').collection('sessions')
-    const list = await sessions.find({"class_id" : mongodb.ObjectID(req.query.class_id)}).toArray()
+	const list = await sessions.find({"class_id" : mongodb.ObjectID(req.query.class_id)}).toArray()
+	const clss = await client.db('orienteering-race-project').collection('schools').findOne({"classes" : {$elemMatch: {"_id": mongodb.ObjectID(req.query.class_id)}}})
     list.forEach((v) => {
       delete v.runs
       delete v.geosJon
       v.id = v._id
-    })
-    res.send(list)
+	})
+	let ret = {
+		class_name: clss.classes.filter(c => c._id == req.query.class_id)[0].name,
+		class_id: mongodb.ObjectID(req.query.class_id),
+		school_name: clss.name,
+		school_id: clss._id,
+		sessions: list
+	}
+    res.send(ret)
   } catch (error) {
     console.log(error)
   } finally {
@@ -31,15 +39,21 @@ router.post('/', async (req, res) => {
     useUnifiedTopology: true
   })
   try {
-    const sessions = client.db('orienteering-race-project').collection('sessions')
+	const sessions = client.db('orienteering-race-project').collection('sessions')
+	const clss = await client.db('orienteering-race-project').collection('schools').findOne({"classes" : {$elemMatch: {"_id": mongodb.ObjectID(req.query.class_id)}}})
     const newSession = {
-      class_id: mongodb.ObjectID(req.query.class_id),
-      sessionName: req.body.sessionName,
+	  school_name: clss.name,
+	  school_id: clss._id,
+	  class_id: mongodb.ObjectID(req.query.class_id),
+	  class_name: clss.classes.filter(c => c._id == req.query.class_id)[0].name,
+      session_name: req.body.sessionName,
       _id: mongodb.ObjectID(),
       date: req.body.date,
       beacons: [],
       runs: []
-    }
+	}
+	console.log("schoolname",newSession.school_name)
+	console.log("classname",newSession.class_name)
     sessions.insertOne(newSession, (err, res) => {
       if (err) throw err
       console.log('success')

@@ -1,10 +1,16 @@
 <template>
   <v-main>
     <v-app-bar color="blue" dark app>
-      <v-toolbar-title>
+      <!-- <v-toolbar-title>
         <router-link :to="`/schools`" class="text-decoration-none" style="color: inherit">
         <v-icon large>mdi-chevron-left</v-icon>
         Établissements
+        </router-link>
+      </v-toolbar-title> -->
+      <v-toolbar-title>
+        <router-link :to="`/schools/${schoolId}/classes`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ schoolName }}</span>
+            <v-icon large>mdi-chevron-right</v-icon>
         </router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>

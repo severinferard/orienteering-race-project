@@ -5,7 +5,7 @@
       <v-card flat color="transparent" width="100%">
         <StudentDataCard
           :value="distance"
-          percent="100"
+          :percent="(distance / bestDistance) * 100"
           title="Distance"
           unit="m"
         ></StudentDataCard>
@@ -14,8 +14,8 @@
     <div class="ui-overlay" id="right-meter">
       <v-card flat color="transparent" width="100%">
         <StudentDataCard
-          :value="(chrono / 60).toFixed() + ':' + (chrono % 60).toFixed()"
-          percent="100"
+          :value="(chrono / 60).toFixed() + ':' + ((chrono % 60).toFixed() < 10 ? '0' : '') + (chrono % 60).toFixed()"
+          :percent="(bestChrono / chrono) * 100"
           title="Chrono"
           :unit="null"
         ></StudentDataCard>
@@ -35,13 +35,16 @@
       </v-row>
     </div>
     <div class="ui-overlay" id="graph">
-      <!-- <StudentGraphCard
+      <StudentGraphCard
         title="Vitesse"
         unit="km/h"
-        :value="10"
+        :value="averageSpeed"
         icon="mdi-speedometer"
+        :values="this.speeds"
+        :sampleRate="this.sampleRate"
+        :beacons="this.beacons"
       >
-      </StudentGraphCard> -->
+      </StudentGraphCard>
     </div>
   </div>
 </template>
@@ -53,14 +56,14 @@ var Rainbow = require("rainbowvis.js");
 import L from "leaflet";
 import StudentDataCard from "@/components/StudentDataCard.vue";
 import StudentDataBar from "@/components/StudentDataBar.vue";
-// import StudentGraphCard from "@/components/StudentGraphCard.vue";
+import StudentGraphCard from "@/components/StudentGraphCard.vue";
 // import image from '@/assets/logo.png'
 
 export default {
   components: {
     StudentDataCard,
     StudentDataBar,
-    // StudentGraphCard,
+    StudentGraphCard,
   },
   props: ["center"],
   data() {
@@ -68,10 +71,13 @@ export default {
       map: null,
       averageSpeed: 0,
       distance: 0,
+      bestDistance: 0,
       chrono: 0,
+      bestChrono: 0,
       speeds: [],
       beacons: [],
-      mapCenter: []
+      mapCenter: [],
+      sampleRate: 0
     };
   },
   methods: {
@@ -176,8 +182,13 @@ export default {
         this.beacons = data.beacons;
         this.id = data.id;
         this.chrono = data.time;
+        this.sampleRate = data.sampleRate;
+        this.bestChrono = data.bestTime;
+        console.log("best chrono", this.bestChrono)
+        console.log((this.bestChrono / this.chrono) * 100)
         this.averageSpeed = data.avgSpeed.toFixed(1);
         this.distance = data.distance.toFixed();
+        this.bestDistance = data.bestDistance.toFixed();
         this.speeds = data.speeds;
         this.geoJson = data.geoJson;
         console.log("geosJson", this.geoJson);
@@ -203,6 +214,7 @@ export default {
   width: 100%;
   height: 100%;
   position: relative;
+  text-align: center;
   /* background: rgb(4, 217, 255) */
 }
 
@@ -229,8 +241,11 @@ export default {
 }
 
 #graph {
+    height: 210px;
   top: 40px;
-  right: 40px;
+  width: 800px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 #map {
@@ -253,7 +268,7 @@ export default {
   font-weight: bold;
 }
 
-.marker-pin-valided::after {
+/* .marker-pin-valided::after {
   content: "";
   width: 24px;
   height: 24px;
@@ -262,7 +277,7 @@ export default {
   position: absolute;
   border-radius: 50%;
   color: white !important;
-}
+} */
 
 .marker-pin-not-valided {
   width: 30px;
@@ -275,7 +290,7 @@ export default {
   top: 50%;
   margin: -15px 0 0 -15px;
 }
-.marker-pin-not-valided::after {
+/* .marker-pin-not-valided::after {
   content: "";
   width: 24px;
   height: 24px;
@@ -284,7 +299,7 @@ export default {
   position: absolute;
   border-radius: 50%;
   color: white !important;
-}
+} */
 
 .custom-div-icon i {
   position: absolute;

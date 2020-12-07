@@ -179,6 +179,7 @@ export default {
   },
   computed: {
     studentPlotData: function () {
+        let averageValue = [...this.students].reduce( ( p, c ) => p + parseFloat(c[this.studentTabPlotType]), 0 ) / this.students.length
       let ret = {
         data: [
           {
@@ -208,8 +209,37 @@ export default {
           xaxis: {
             tickangle: -45,
           },
+          shapes: [{
+        type: 'line',
+        xref: 'paper',
+        x0: 0,
+        y0: averageValue,
+        x1: 1,
+        y1: averageValue,
+        line:{
+            color: '#ddd',
+            width: 4,
+            dash:'dot'
+        }
+    }],
+    annotations: [{
+            x: 1,
+            y: averageValue,
+            xref: "paper",
+            yref: "y",
+            text: 'Moyenne',
+            showarrow: false,
+            font: {
+              size: 28,
+              weight: 15,
+              color: "#ddd",
+            },
+            yanchor:"bottom"
+          }]
         },
       };
+      console.log("average", averageValue)
+      console.log([...this.students])
       return ret;
     },
   },

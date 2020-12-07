@@ -1,14 +1,27 @@
 <template>
   <v-main>
     <v-app-bar color="blue" dark app>
-      <v-toolbar-title>
+      <!-- <v-toolbar-title>
         <router-link :to="`/schools/${schoolId}/classes/${classId}/sessions`" class="text-decoration-none" style="color: inherit">
           <v-icon large>mdi-chevron-left</v-icon>
           Sessions
         </router-link>
+      </v-toolbar-title> -->
+            <v-toolbar-title>
+        <router-link :to="`/schools/${schoolId}/classes`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ schoolName }}</span>
+            <v-icon large>mdi-chevron-right</v-icon>
+        </router-link>
+        <router-link :to="`/schools/${schoolId}/classes/${classId}/sessions`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ className }}</span>
+            <v-icon large>mdi-chevron-right</v-icon>
+        </router-link>
+        <router-link :to="`/session/${sessionId}`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ sessionName }}</span>
+        </router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <span class="px-3">{{ sessionName }}</span>
+      <span class="px-3">{{ sessionDate }}</span>
       <v-btn text @click="settings = true"><v-icon large>mdi-cog</v-icon></v-btn>
     </v-app-bar>
     <v-container class="fill-height">
@@ -129,6 +142,9 @@ export default {
   data() {
     return {
       schoolId: "",
+      schoolName: "",
+      sessionId: this.$route.params.session_id,
+      className: "",
       classId: "",
       students: [],
       sessionName: "",
@@ -163,9 +179,11 @@ export default {
       this.students = res.data.runs.map((run) => {
         return { id: run.id };
       });
-      this.schoolId = res.data.schoolId
+      this.schoolId = res.data.school_id
       this.classId = res.data.class_id
-      this.sessionName = res.data.sessionName;
+      this.className = res.data.class_name;
+      this.schoolName = res.data.school_name;
+      this.sessionName = res.data.session_name;
       this.sessionDate = res.data.date;
       console.log('beacons', res.data.beacons)
       this.beacons = res.data.beacons.map((beacon) => {

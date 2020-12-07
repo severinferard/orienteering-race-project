@@ -1,10 +1,19 @@
 <template>
   <v-main>
     <v-app-bar color="blue" dark app>
-      <v-toolbar-title><router-link :to="`/schools/${schoolId}/classes`" class="text-decoration-none" style="color: inherit">
+      <!-- <v-toolbar-title><router-link :to="`/schools/${schoolId}/classes`" class="text-decoration-none" style="color: inherit">
         <v-icon large>mdi-chevron-left</v-icon>
         Classes
-        </router-link></v-toolbar-title>
+        </router-link></v-toolbar-title> -->
+        <v-toolbar-title>
+        <router-link :to="`/schools/${schoolId}/classes`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ schoolName }}</span>
+            <v-icon large>mdi-chevron-right</v-icon>
+        </router-link>
+        <router-link :to="`/schools/${schoolId}/classes/${classId}/sessions`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ className }}</span>
+        </router-link>
+      </v-toolbar-title>
     </v-app-bar>
     <v-container class="fill-height">
       <v-row align="center" justify="center">
@@ -28,7 +37,7 @@
               <v-list-item-group>
                 <v-list-item v-for="sess in sessions" :key="sess.id" :to="makeLink(sess.id)">
                   <v-list-item-content>
-                    {{ sess.sessionName }}
+                    {{ sess.session_name }}
                   </v-list-item-content>
                   <v-list-item-content>
                       <v-subheader>{{ sess.date }}</v-subheader>
@@ -89,6 +98,10 @@ export default {
       dialog: false,
       newItem: {},
       dateMenu: false,
+      schoolName: "",
+      className: "",
+      classId: "",
+      sessionDate: "",
     };
   },
   computed: {
@@ -104,8 +117,13 @@ export default {
     },
     async loadData() {
       const res = await axios.get(`/api/sessions/`, {params: {class_id: this.$route.params.class_id}});
-      console.log(res.data);
-      this.sessions = res.data;
+      console.log("data",res.data);
+      this.sessions = res.data.sessions;
+      this.schoolName = res.data.school_name;
+      this.className = res.data.class_name;
+      this.schoolId = res.data.school_id;
+      this.classId = res.data.class_id;
+      this.sessionDate = res.data.session_date;
       this.loading = false;
     },
     newSession() {

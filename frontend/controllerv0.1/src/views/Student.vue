@@ -2,17 +2,24 @@
   <v-main>
     <v-app-bar color="blue" dark>
       <v-toolbar-title>
-        <router-link
-          :to="`/session/${sessionId}`"
-          class="text-decoration-none"
-          style="color: inherit"
-        >
-          <v-icon large>mdi-chevron-left</v-icon>
-          {{ sessionName }}
+        <router-link :to="`/schools/${schoolId}/classes`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ schoolName }}</span>
+            <v-icon large>mdi-chevron-right</v-icon>
+        </router-link>
+        <router-link :to="`/schools/${schoolId}/classes/${classId}/sessions`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ className }}</span>
+            <v-icon large>mdi-chevron-right</v-icon>
+        </router-link>
+        <router-link :to="`/session/${sessionId}`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ sessionName }}</span>
+            <v-icon large>mdi-chevron-right</v-icon>
+        </router-link>
+        <router-link :to="`#`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ id }}</span>
         </router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <span class="px-3">{{ id }}</span>
+      <span class="px-3">{{ sessionDate }}</span>
       <v-progress-linear
         :active="loadingData"
         :indeterminate="loadingData"
@@ -26,69 +33,6 @@
       <MyMap ref="myMap" :geoJson="geoJson" :center="mapCenter"> </MyMap>
     </v-card>
     <div class="pt-0 pl-0 mx-5">
-      <!-- <v-row height="300px">
-        <v-col cols="6">
-          <v-row style="height: 100%">
-            <v-col cols="4">
-              <StudentDataCard
-                icon="mdi-timer"
-                title="Chrono"
-                unit="min"
-                percent="100"
-              >
-                <template v-slot:value>
-                  <span class="display-2">{{ Math.floor(chrono / 60) }}</span>
-                  <span class="display-1">:</span>
-                  <span class="display-2">{{ getMins(chrono) }}</span>
-                </template>
-              </StudentDataCard>
-            </v-col>
-            <v-col cols="4">
-              <StudentDataCard
-                icon="mdi-shoe-print"
-                :value="distance"
-                percent="100"
-                title="Distance"
-                unit="m"
-              ></StudentDataCard>
-            </v-col>
-            <v-col cols="4">
-              <StudentDataCard
-                icon="mdi-crosshairs-gps"
-                :value="validedBeacons"
-                title="Balises"
-                unit="-"
-                :percent="percentBeacons"
-              ></StudentDataCard>
-            </v-col>
-          </v-row>
-        </v-col>
-        <v-col cols="6">
-          <v-row style="height: 100%">
-            <v-col>
-              <StudentGraphCard
-                title="Vitesse"
-                unit="km/h"
-                :value="averageSpeed"
-                icon="mdi-speedometer"
-              >
-                <template v-slot:graph>
-                  <v-sheet>
-                    <v-sparkline
-                      :smooth="16"
-                      :gradient="['#ffd200', '#1feaea', '#f72047']"
-                      :line-width="3"
-                      :value="speeds"
-                      auto-draw
-                      stroke-linecap="round"
-                    ></v-sparkline>
-                  </v-sheet>
-                </template>
-              </StudentGraphCard>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row> -->
       <v-row
         ><v-col
           ><v-card>
@@ -155,6 +99,11 @@ export default {
       id: "",
       sessionName: "",
       sessionId: this.$route.params.session_id,
+      sessionDate: "",
+      schoolName: "",
+      schoolId: "",
+      classId: "",
+      className: "",
       averageSpeed: 0,
       distance: 0,
       chrono: 0,
@@ -195,18 +144,26 @@ export default {
         const res = await axios.get(
           `/api/runs/${this.$route.params.session_id}/${this.$route.params.student_id}`
         );
-		const data = res.data;
-		console.log("data", data);
+        const data = res.data;
+        console.log("data", data);
         this.balises = data.beacons;
-        this.sessionName = data.sessionName;
+        this.sessionName = data.session_name;
+        this.sessionDate = data.session_date;
+        this.sessionId = this.$route.params.session_id;
+        this.classId = data.class_id;
+        this.schoolName = data.school_name;
+        this.schoolId = data.school_id;
+        this.className = data.class_name;
+        console.log("data.class_name;",data.class_name)
+        console.log("date", this.sessionDate);
         this.id = data.id;
         this.chrono = data.time;
         this.averageSpeed = data.avgSpeed.toFixed(1);
         this.distance = data.distance.toFixed();
         this.speeds = data.speeds;
         this.comment = data.comment;
-		this.rating = data.rating;
-		console.log("original rating", this.rating)
+        this.rating = data.rating;
+        console.log("original rating", this.rating)
         this.geoJson = data.geoJson;
         console.log("geosJson",this.geoJson)
         this.mapCenter = data.beacons[0].coords;
