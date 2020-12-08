@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pt-3 px-4" width="100%" color="rgba(0,199,200, 0.3)">
+  <v-card class="hud-overlay pt-3 px-4" width="100%" color="#078e889c" outlined>
     <v-row justify="center" align="center">
       <v-col v-if="left" cols="2" class="pt-0 mt-0"
         ><span style="color: #fff; font-size: 30px" class="mandalore">{{

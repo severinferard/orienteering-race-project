@@ -1,5 +1,5 @@
 <template>
-  <v-card height="100%" class="px-3" color="rgba(0,199,200, 0.3)">
+  <v-card height="100%" class="hud-overlay px-3" color="#078e889c" outlined>
     <v-row style="height: 200px">
       <v-col
         ><v-card-actions class="justify-center">
@@ -64,6 +64,11 @@ export default {
 </script>
 
 <style>
+.hud-overlay {
+	border-width: 3px !important;
+	border-color: #6fe0dbad !important;
+}
+
 .mandalore {
   font-family: "Mandalore" !important;
 }

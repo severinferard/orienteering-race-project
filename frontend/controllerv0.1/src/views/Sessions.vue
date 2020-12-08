@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <v-app-bar color="blue" dark app>
+    <v-app-bar color="primary" dark app>
       <!-- <v-toolbar-title><router-link :to="`/schools/${schoolId}/classes`" class="text-decoration-none" style="color: inherit">
         <v-icon large>mdi-chevron-left</v-icon>
         Classes
@@ -19,7 +19,7 @@
       <v-row align="center" justify="center">
         <v-col cols="8">
           <v-card width="100%" height="400px" class="overflow-y-auto">
-            <v-toolbar color="blue darken-3" dark>
+            <v-toolbar color="primary lighten-3" dark>
               <v-toolbar-title>Sessions</v-toolbar-title>
               <v-btn @click.stop="newSession" absolute bottom color="white" fab right light>
                 <v-icon>mdi-plus</v-icon></v-btn

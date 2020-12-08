@@ -7,6 +7,7 @@ import SessionsPage from '../views/Sessions.vue'
 import TeacherPage from '../views/Teacher.vue'
 import SchoolsPage from '../views/Schools.vue'
 import ClassesPage from '../views/Classes.vue'
+import StudentSummary from '../views/StudentSummary.vue'
 
 import 'leaflet/dist/leaflet.css';
 
@@ -56,6 +57,11 @@ const routes = [
     path: '/session/:session_id/teacher-recap/',
     name: 'teacher recap',
     component: TeacherPage
+  },
+  {
+    path: '/student-summary/:class_id/:student_id',
+    name: 'student summary',
+    component: StudentSummary
   }
 ]
 

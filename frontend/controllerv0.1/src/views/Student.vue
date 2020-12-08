@@ -1,17 +1,17 @@
 <template>
   <v-main>
-    <v-app-bar color="blue" dark>
+    <v-app-bar color="primary" dark>
       <v-toolbar-title>
-        <router-link :to="`/schools/${schoolId}/classes`" class="text-decoration-none" style="color: inherit">
-            <span class="px-3">{{ schoolName }}</span>
+        <router-link :to="`/schools/${school.id}/classes`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ school.name }}</span>
             <v-icon large>mdi-chevron-right</v-icon>
         </router-link>
-        <router-link :to="`/schools/${schoolId}/classes/${classId}/sessions`" class="text-decoration-none" style="color: inherit">
-            <span class="px-3">{{ className }}</span>
+        <router-link :to="`/schools/${school.id}/classes/${clss.id}/sessions`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ clss.name }}</span>
             <v-icon large>mdi-chevron-right</v-icon>
         </router-link>
-        <router-link :to="`/session/${sessionId}`" class="text-decoration-none" style="color: inherit">
-            <span class="px-3">{{ sessionName }}</span>
+        <router-link :to="`/session/${session.id}`" class="text-decoration-none" style="color: inherit">
+            <span class="px-3">{{ session.name }}</span>
             <v-icon large>mdi-chevron-right</v-icon>
         </router-link>
         <router-link :to="`#`" class="text-decoration-none" style="color: inherit">
@@ -19,7 +19,7 @@
         </router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <span class="px-3">{{ sessionDate }}</span>
+      <span class="px-3">{{ session.date }}</span>
       <v-progress-linear
         :active="loadingData"
         :indeterminate="loadingData"
@@ -84,26 +84,18 @@
 <script>
 import axios from "axios";
 import MyMap from "@/components/MyMap.vue";
-// import StudentDataCard from "@/components/StudentDataCard.vue";
-// import StudentGraphCard from "@/components/StudentGraphCard.vue";
 import StudentFeedbackForm from "@/components/StudentFeedbackForm.vue";
 export default {
   components: {
     MyMap,
-    // StudentDataCard,
-    // StudentGraphCard,
     StudentFeedbackForm,
   },
   data() {
     return {
       id: "",
-      sessionName: "",
-      sessionId: this.$route.params.session_id,
-      sessionDate: "",
-      schoolName: "",
-      schoolId: "",
-      classId: "",
-      className: "",
+      session: {id: this.$route.params.session_id, name: "", date: ""},
+      school: {id: "", name: ""},
+      clss: {id: "", name: ""},
       averageSpeed: 0,
       distance: 0,
       chrono: 0,
@@ -147,15 +139,15 @@ export default {
         const data = res.data;
         console.log("data", data);
         this.balises = data.beacons;
-        this.sessionName = data.session_name;
-        this.sessionDate = data.session_date;
-        this.sessionId = this.$route.params.session_id;
-        this.classId = data.class_id;
-        this.schoolName = data.school_name;
-        this.schoolId = data.school_id;
-        this.className = data.class_name;
+        this.session.name = data.session_name;
+        this.session.date = data.session_date;
+        this.session.id = this.$route.params.session_id;
+        this.clss.id = data.class_id;
+        this.clss.name = data.class_name;
+        this.school.name = data.school_name;
+        this.school.id = data.school_id;
         console.log("data.class_name;",data.class_name)
-        console.log("date", this.sessionDate);
+        console.log("date", this.session.date);
         this.id = data.id;
         this.chrono = data.time;
         this.averageSpeed = data.avgSpeed.toFixed(1);

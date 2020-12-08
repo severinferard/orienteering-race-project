@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <v-app-bar color="blue" dark app>
+    <v-app-bar color="primary" dark app>
       <!-- <v-toolbar-title>
         <router-link :to="`/schools`" class="text-decoration-none" style="color: inherit">
         <v-icon large>mdi-chevron-left</v-icon>

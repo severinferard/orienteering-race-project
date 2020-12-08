@@ -1,5 +1,5 @@
 <template>
-  <v-card height="100%" class="px-3" color="rgba(0,199,200, 0.3)">
+  <v-card height="100%" class="px-3 hud-overlay" color="#078e889c" outlined>
     <v-card-title class="py-0">
       <v-spacer></v-spacer>
       <v-row align="end">
@@ -111,3 +111,9 @@ export default {
   },
 };
 </script>
+<style>
+	.hud-overlay {
+		border-width: 3px !important;
+		border-color: #6fe0dbad !important;
+		}
+</style>
