@@ -180,10 +180,6 @@ export default {
         const data = res.data;
         console.log("data", data);
 		this.beacons = data.beacons;
-		if (!data.distance.length)
-			throw "Le movuino n'a enregistré aucune données"
-		if (!data.beacons.length)
-			throw "Auncune balises enregistrée"
         this.id = data.id;
         this.chrono = data.time;
         this.sampleRate = data.sampleRate;

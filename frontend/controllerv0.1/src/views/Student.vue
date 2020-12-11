@@ -146,7 +146,7 @@ export default {
         );
         const data = res.data;
         console.log("data", data);
-        if (!data.distance.length)
+        if (!data.rawPositions.length)
 			throw "Le movuino n'a enregistré aucune données"
 		if (!data.beacons.length)
 			throw "Auncune balises enregistrées"
