@@ -33,7 +33,10 @@ router.get('/:session_id/:student_id', async (req, res) => {
     run.avgSpeed = DataLoader.getAverageSpeed(run.speeds)
     run.beacons = DataLoader.evaluateBeacons(run.rawPositions, sessionBeacons, beaconRange, run.speeds, run.sampleRate)
     run.distance = DataLoader.getDistanceFromPoints(run.rawPositions)
-    run.time = DataLoader.getTime(run.rawPositions, run.sampleRate)
+	run.time = DataLoader.getTime(run.rawPositions, run.sampleRate)
+	console.log("rawpos len", run.rawPositions.length)
+	console.log("samplerate", run.sampleRate)
+	console.log("time", run.time)
     run.geoJson = GeoJsonLoader.createGeoJson(run)
     res.send(run)
   } catch (error) {

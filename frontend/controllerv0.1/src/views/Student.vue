@@ -1,25 +1,33 @@
 <template>
   <v-main>
-    <v-app-bar color="primary" dark>
-      <v-toolbar-title>
-        <router-link :to="`/schools/${school.id}/classes`" class="text-decoration-none" style="color: inherit">
+    <v-app-bar color="primary" dark app style="z-index: 999999">
+         <v-toolbar-title><router-link to="/">
+            <h3 class="secondary--text text--lighten-1 font-weight-light px-4">DORA</h3>
+          </router-link></v-toolbar-title>
+                  <router-link to="/tree">
+            <h4 class="secondary--text text--lighten-1 font-weight-light px-4">Dashboard</h4>
+          </router-link>
+      <!-- <v-toolbar-title> -->
+        <!-- <router-link :to="`/schools/${school.id}/classes`" class="text-decoration-none" style="color: inherit"> -->
             <span class="px-3">{{ school.name }}</span>
-            <v-icon large>mdi-chevron-right</v-icon>
-        </router-link>
-        <router-link :to="`/schools/${school.id}/classes/${clss.id}/sessions`" class="text-decoration-none" style="color: inherit">
+            <v-icon >mdi-chevron-right</v-icon>
+        <!-- </router-link> -->
+        <!-- <router-link :to="`/schools/${school.id}/classes/${clss.id}/sessions`" class="text-decoration-none" style="color: inherit"> -->
             <span class="px-3">{{ clss.name }}</span>
-            <v-icon large>mdi-chevron-right</v-icon>
-        </router-link>
-        <router-link :to="`/session/${session.id}`" class="text-decoration-none" style="color: inherit">
+            <v-icon >mdi-chevron-right</v-icon>
+        <!-- </router-link> -->
+        <!-- <router-link :to="`/session/${session.id}`" class="text-decoration-none" style="color: inherit"> -->
             <span class="px-3">{{ session.name }}</span>
-            <v-icon large>mdi-chevron-right</v-icon>
-        </router-link>
-        <router-link :to="`#`" class="text-decoration-none" style="color: inherit">
+            <v-icon >mdi-chevron-right</v-icon>
+        <!-- </router-link> -->
+        <!-- <router-link :to="`#`" class="text-decoration-none" style="color: inherit"> -->
             <span class="px-3">{{ id }}</span>
-        </router-link>
-      </v-toolbar-title>
+        <!-- </router-link> -->
+      <!-- </v-toolbar-title> -->
       <v-spacer></v-spacer>
-      <span class="px-3">{{ session.date }}</span>
+      <v-btn class="mx-3" outlined :to="`/session/${session.id}/#`">Autres éleves</v-btn>
+      <v-btn class="mx-3" outlined :to="`/student-summary/${clss.id}/${id}`">Resumé des séances</v-btn>
+      <!-- <span class="px-3">{{ session.date }}</span> -->
       <v-progress-linear
         :active="loadingData"
         :indeterminate="loadingData"
@@ -138,6 +146,10 @@ export default {
         );
         const data = res.data;
         console.log("data", data);
+        if (!data.distance.length)
+			throw "Le movuino n'a enregistré aucune données"
+		if (!data.beacons.length)
+			throw "Auncune balises enregistrées"
         this.balises = data.beacons;
         this.session.name = data.session_name;
         this.session.date = data.session_date;
@@ -150,6 +162,7 @@ export default {
         console.log("date", this.session.date);
         this.id = data.id;
         this.chrono = data.time;
+        console.log("chrono",this.chrono)
         this.averageSpeed = data.avgSpeed.toFixed(1);
         this.distance = data.distance.toFixed();
         this.speeds = data.speeds;

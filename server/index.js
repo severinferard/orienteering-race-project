@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const port = process.env.PORT || 5000;
 
 const app = express()
 app.use(bodyParser.json())
@@ -23,11 +24,12 @@ app.use('/api/schools', schools)
 app.use('/api/student-summary', studentSummary)
 
 // if (process.env.NODE_ENV === 'production') {
-//   console.log('production')
-//   app.use(express.static(__dirname + '/public/'))
-//   app.get(/.*/, (req, res) => {
-//     res.sendFile(__dirname + '/public/index.html')
-//   })
-// }
+if (true) {
+    console.log('production')
+    app.use(express.static(__dirname + '/public/'))
+    app.get(/.*/, (req, res) => {
+        res.sendFile(__dirname  + '/public/index.html')
+    });
+}
 
-app.listen(5000, () => console.log('Server running on port 5000'))
+app.listen(port, () => console.log('Server running on port 5000'))

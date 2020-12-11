@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
 	  school_id: clss._id,
 	  class_id: mongodb.ObjectID(req.query.class_id),
 	  class_name: clss.classes.filter(c => c._id == req.query.class_id)[0].name,
-      session_name: req.body.sessionName,
+      session_name: req.body.session_name,
       _id: mongodb.ObjectID(),
       date: req.body.date,
       beacons: [],
@@ -58,7 +58,8 @@ router.post('/', async (req, res) => {
       if (err) throw err
       console.log('success')
       client.close()
-    })
+	})
+	res.send({id: newSession._id})
   } catch (error) {
     console.log(error)
     client.close()

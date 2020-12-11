@@ -85,8 +85,8 @@ export default {
             y1: Math.max(...this.values),
             text: "test",
             line: {
-              color: "#2297F3",
-              width: 6,
+              color: "#fff",
+              width: 2,
               dash: "dash"
             },
           });
@@ -99,9 +99,9 @@ export default {
 			showarrow: false,
 			yanchor: 'top',
             font: {
-              size: 28,
-              weight: 15,
-              color: "#2297F3",
+              size: 20,
+              weight: 3,
+              color: "#fff",
             },
           });
         }

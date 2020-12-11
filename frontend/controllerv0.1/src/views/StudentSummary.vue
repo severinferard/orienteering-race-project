@@ -1,19 +1,25 @@
 <template>
     <v-main>
-        <v-app-bar color="blue" dark>
-      <v-toolbar-title>
-        <router-link :to="`/schools/${school.id}/classes`" class="text-decoration-none" style="color: inherit">
+         <v-app-bar color="primary" dark app style="z-index: 999999">
+         <v-toolbar-title><router-link to="/">
+            <h3 class="secondary--text text--lighten-1 font-weight-light px-4">DORA</h3>
+          </router-link></v-toolbar-title>
+                  <router-link to="/tree">
+            <h4 class="secondary--text text--lighten-1 font-weight-light px-4">Dashboard</h4>
+          </router-link>
+      <!-- <v-toolbar-title> -->
+        <!-- <router-link :to="`/schools/${school.id}/classes`" class="text-decoration-none" style="color: inherit"> -->
             <span class="px-3">{{ school.name }}</span>
-            <v-icon large>mdi-chevron-right</v-icon>
-        </router-link>
-        <router-link :to="`/schools/${school.id}/classes/${clss.id}/sessions`" class="text-decoration-none" style="color: inherit">
+            <v-icon >mdi-chevron-right</v-icon>
+        <!-- </router-link> -->
+        <!-- <router-link :to="`/schools/${school.id}/classes/${clss.id}/sessions`" class="text-decoration-none" style="color: inherit"> -->
             <span class="px-3">{{ clss.name }}</span>
-            <v-icon large>mdi-chevron-right</v-icon>
-        </router-link>
-        <router-link :to="`#`" class="text-decoration-none" style="color: inherit">
+            <v-icon >mdi-chevron-right</v-icon>
+        <!-- </router-link> -->
+        <!-- <router-link :to="`#`" class="text-decoration-none" style="color: inherit"> -->
             <span class="px-3">{{ id }}</span>
-        </router-link>
-      </v-toolbar-title>
+        <!-- </router-link> -->
+      <!-- </v-toolbar-title> -->
       <v-spacer></v-spacer>
       <!-- <v-progress-linear
         :active="loadingData"
@@ -82,18 +88,30 @@
             <template v-slot:[`item.time`]="{item}">
                 {{Math.floor(item.time/60)}}:{{getMins(item.time)}}
             </template>
-			<template v-slot:[`item.distance`]="{item}">
-				{{item.distance.toFixed(1)}}
-			</template>
-			<template v-slot:[`item.avgSpeed`]="{item}">
-				{{item.avgSpeed.toFixed(1)}}
-			</template>
-			<template v-slot:[`item.beaconsSuccess`]="{item}">
-				{{item.beaconsSuccess.toFixed(1)}}
-			</template>
+            <template v-slot:[`item.distance`]="{item}">
+                {{item.distance.toFixed(1)}}
+            </template>
+            <template v-slot:[`item.avgSpeed`]="{item}">
+                {{item.avgSpeed.toFixed(1)}}
+            </template>
+            <template v-slot:[`item.beaconsSuccess`]="{item}">
+                {{item.beaconsSuccess.toFixed(1)}}
+            </template>
             </v-data-table>
             </v-tab-item>
         </v-tabs-items>
+        </v-card>
+        <v-card class="mx-6 my-3" v-for="run in students" :key="run.session.id">
+            <v-row text-align="end" align-content="center" align="start" justify="center" class="px-3">
+                <v-col class="px-3" text-align="end">
+                    <span class="overline">{{run.session.name}}</span><br>
+                    <span class="subheader">{{run.session.date}}</span>
+                    {{run.comment}}
+                </v-col>
+                <v-col>
+                    <img src="@/assets/cool.png" height="100px" />
+                </v-col>
+            </v-row>
         </v-card>
     </v-main>
 </template>
@@ -146,7 +164,7 @@ export default {
         this.clss.id = data.class_id
         this.clss.name = data.class_name
 
-		this.students = data.runs.filter(run => !!run);
+        this.students = data.runs.filter(run => !!run);
         console.log("this.students", this.students)
       } catch (error) {
           console.log(error)
@@ -161,8 +179,8 @@ export default {
     },
           computed: {
     studentPlotData: function () {
-		console.log(this.studentTabPlotType)
-		this.students.forEach(run => console.log("run", run[this.studentTabPlotType]))
+        console.log(this.studentTabPlotType)
+        this.students.forEach(run => console.log("run", run[this.studentTabPlotType]))
         let averageValue = [...this.students].reduce( ( p, c ) => p + parseFloat(c[this.studentTabPlotType]), 0 ) / this.students.length
       let ret = {
         data: [

@@ -1,28 +1,32 @@
 <template>
   <v-main>
-    <v-app-bar color="primary" dark app>
+     <v-app-bar color="primary" dark app style="z-index: 999999">
+         <v-toolbar-title><router-link to="/">
+            <h3 class="secondary--text text--lighten-1 font-weight-light px-4">DORA</h3>
+          </router-link></v-toolbar-title>
+                  <router-link to="/tree">
+            <h4 class="secondary--text text--lighten-1 font-weight-light px-4">Dashboard</h4>
+          </router-link>
       <!-- <v-toolbar-title>
         <router-link :to="`/schools/${schoolId}/classes/${classId}/sessions`" class="text-decoration-none" style="color: inherit">
           <v-icon large>mdi-chevron-left</v-icon>
           Sessions
         </router-link>
       </v-toolbar-title> -->
-            <v-toolbar-title>
-        <router-link :to="`/schools/${schoolId}/classes`" class="text-decoration-none" style="color: inherit">
+        <!-- <router-link :to="`/schools/${schoolId}/classes`" class="text-decoration-none" style="color: inherit"> -->
             <span class="px-3">{{ schoolName }}</span>
-            <v-icon large>mdi-chevron-right</v-icon>
-        </router-link>
-        <router-link :to="`/schools/${schoolId}/classes/${classId}/sessions`" class="text-decoration-none" style="color: inherit">
+            <v-icon>mdi-chevron-right</v-icon>
+        <!-- </router-link> -->
+        <!-- <router-link :to="`/schools/${schoolId}/classes/${classId}/sessions`" class="text-decoration-none" style="color: inherit"> -->
             <span class="px-3">{{ className }}</span>
-            <v-icon large>mdi-chevron-right</v-icon>
-        </router-link>
-        <router-link :to="`/session/${sessionId}`" class="text-decoration-none" style="color: inherit">
+            <v-icon>mdi-chevron-right</v-icon>
+        <!-- </router-link> -->
+        <!-- <router-link :to="`/session/${sessionId}`" class="text-decoration-none" style="color: inherit"> -->
             <span class="px-3">{{ sessionName }}</span>
-        </router-link>
-      </v-toolbar-title>
+        <!-- </router-link> -->
       <v-spacer></v-spacer>
       <span class="px-3">{{ sessionDate }}</span>
-      <v-btn text @click="settings = true"><v-icon large>mdi-cog</v-icon></v-btn>
+      <!-- <v-btn text @click="settings = true"><v-icon large>mdi-cog</v-icon></v-btn> -->
     </v-app-bar>
     <v-container class="fill-height">
       <v-row align="center" justify="center">

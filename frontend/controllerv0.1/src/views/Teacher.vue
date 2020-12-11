@@ -1,22 +1,20 @@
 <template>
   <v-main>
-    <v-app-bar color="blue" dark>
-      <v-toolbar-title>
-        <router-link :to="`/session/${sessionId}`" class="text-decoration-none" style="color: inherit">
-          <v-icon large>mdi-chevron-left</v-icon>
-          {{ sessionName }}
-        </router-link>
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <span class="px-3">{{ id }}</span>
-      <v-progress-linear
-        :active="loadingData"
-        :indeterminate="loadingData"
-        absolute
-        bottom
-        color="blue darken-4"
-      ></v-progress-linear>
-    </v-app-bar>
+<v-app-bar color="primary" dark app style="z-index: 999999">
+         <v-toolbar-title><router-link to="/">
+            <h3 class="secondary--text text--lighten-1 font-weight-light px-4">DORA</h3>
+          </router-link></v-toolbar-title>
+                  <router-link to="/tree">
+            <h4 class="secondary--text text--lighten-1 font-weight-light px-4">Dashboard</h4>
+          </router-link>
+          <span class="px-3">{{ schoolName }}</span>
+          <v-icon >mdi-chevron-right</v-icon>
+          <span class="px-3">{{ className }}</span>
+          <v-icon >mdi-chevron-right</v-icon>
+          <span class="px-3">{{ sessionName }}</span>
+          
+
+</v-app-bar>
     <v-alert v-if="loadingError" type="error">{{ loadingErrorStatus }}</v-alert>
     <v-card color="lime" class="map-wrapper mx-5 mt-5">
       <TeacherMap ref="myMap" :geoJson="geoJson" :center="mapCenter" :colors="colorMap"> </TeacherMap>
@@ -153,6 +151,8 @@ export default {
       mapCenter: null,
       id: null,
       geoJson: null,
+      schoolName: "",
+      className: "",
       beacons: [],
       students: [],
       beaconPlotData: { data: null, layout: null },
@@ -274,8 +274,11 @@ export default {
       try {
         const res = await axios.get(`/api/teacher/${this.$route.params.session_id}/`);
         const data = res.data;
+        console.log('data', data)
         this.beacons = data.beacons;
-        this.sessionName = data.sessionName;
+        this.sessionName = data.session_name;
+        this.className = data.class_name;
+        this.schoolName = data.school_name;
         this.id = data.id;
         this.geoJson = data.geoJson;
         this.colorMap = new Map();

@@ -25,11 +25,15 @@ class DataLoader {
     const dists = points.map((point, index) => {
       if (index === 0) return 0
       return turfDistance(point, points[index - 1]) * 1000
-    })
+	})
+	if (!dists.length)
+		return []
     return dists.reduce((a, b) => a + b)
   }
 
   static getAverageSpeed (speeds) {
+	  if (!speeds.length)
+	  	return -1;
     return speeds.reduce((a, b) => a + b) / speeds.length
   }
 
@@ -66,7 +70,7 @@ class DataLoader {
   }
 
   static getTime (points, sampleRate) {
-    return points.length / sampleRate
+    return points.length * sampleRate
   }
 
   static getBeaconSuccess (session, beaconID) {

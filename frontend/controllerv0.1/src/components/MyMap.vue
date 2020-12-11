@@ -14,7 +14,7 @@
     <div class="ui-overlay" id="right-meter">
       <v-card flat color="transparent" width="100%">
         <StudentDataCard
-          :value="(chrono / 60).toFixed() + ':' + ((chrono % 60).toFixed() < 10 ? '0' : '') + (chrono % 60).toFixed()"
+          :value="formatedChrono"
           :percent="(bestChrono / chrono) * 100"
           title="Chrono"
           :unit="null"
@@ -176,22 +176,24 @@ export default {
       try {
         const res = await axios.get(
           `/api/runs/${this.$route.params.session_id}/${this.$route.params.student_id}`
-        );
+		);
         const data = res.data;
         console.log("data", data);
-        this.beacons = data.beacons;
+		this.beacons = data.beacons;
+		if (!data.distance.length)
+			throw "Le movuino n'a enregistré aucune données"
+		if (!data.beacons.length)
+			throw "Auncune balises enregistrée"
         this.id = data.id;
         this.chrono = data.time;
         this.sampleRate = data.sampleRate;
         this.bestChrono = data.bestTime;
-        console.log("best chrono", this.bestChrono)
         console.log((this.bestChrono / this.chrono) * 100)
         this.averageSpeed = data.avgSpeed.toFixed(1);
         this.distance = data.distance.toFixed();
         this.bestDistance = data.bestDistance.toFixed();
         this.speeds = data.speeds;
         this.geoJson = data.geoJson;
-        console.log("geosJson", this.geoJson);
         this.mapCenter = data.beacons[0].coords;
         this.addGeoJson(this.geoJson);
         this.map.setView([this.mapCenter[1], this.mapCenter[0]], 16)
@@ -200,6 +202,11 @@ export default {
       }
       this.loadingData = false;
     },
+  },
+  computed: {
+      formatedChrono() {
+          return (this.chrono < 60 ? '0' :  (this.chrono / 60).toFixed()) + ':' + ((this.chrono % 60).toFixed() < 10 ? '0' : '') + (this.chrono % 60).toFixed()
+      }
   },
   created() {
       this.loadData();
