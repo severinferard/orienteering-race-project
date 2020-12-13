@@ -1,8 +1,10 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const Gpio = require('onoff').Gpio
 const port = process.env.PORT || 5000;
 
+const LED = new Gpio(26, 'out')
 const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.text());
@@ -24,12 +26,13 @@ app.use('/api/schools', schools)
 app.use('/api/student-summary', studentSummary)
 
 // if (process.env.NODE_ENV === 'production') {
-// if (true) {
-//     console.log('production')
-//     app.use(express.static(__dirname + '/public/'))
-//     app.get(/.*/, (req, res) => {
-//         res.sendFile(__dirname  + '/public/index.html')
-//     });
-// }
+if (true) {
+    console.log('production')
+    app.use(express.static(__dirname + '/public/'))
+    app.get(/.*/, (req, res) => {
+        res.sendFile(__dirname  + '/public/index.html')
+    });
+}
 
+LED.writeSync(1)
 app.listen(port, () => console.log('Server running on port 5000'))
