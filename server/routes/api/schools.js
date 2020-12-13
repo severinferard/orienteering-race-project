@@ -52,7 +52,8 @@ router.post('/', async (req, res) => {
     const newSchool = {
       name: req.body.name,
       _id: new mongodb.ObjectID(),
-      city: req.body.city
+	  city: req.body.city,
+	  classes: []
     }
     collection.insertOne(newSchool, (err, re) => {
       if (err) throw err

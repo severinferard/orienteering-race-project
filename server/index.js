@@ -24,12 +24,12 @@ app.use('/api/schools', schools)
 app.use('/api/student-summary', studentSummary)
 
 // if (process.env.NODE_ENV === 'production') {
-if (true) {
-    console.log('production')
-    app.use(express.static(__dirname + '/public/'))
-    app.get(/.*/, (req, res) => {
-        res.sendFile(__dirname  + '/public/index.html')
-    });
-}
+// if (true) {
+//     console.log('production')
+//     app.use(express.static(__dirname + '/public/'))
+//     app.get(/.*/, (req, res) => {
+//         res.sendFile(__dirname  + '/public/index.html')
+//     });
+// }
 
 app.listen(port, () => console.log('Server running on port 5000'))
