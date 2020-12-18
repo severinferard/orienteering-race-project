@@ -84,6 +84,7 @@ export default {
     setupLeaflet() {
       let map = L.map("map");
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+		// L.tileLayer("file:///Users/severin/Downloads/Mobile%20Atlas%20Creator%202/atlases/4uMaps/{z}/{x}/{y}.png", { 
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
