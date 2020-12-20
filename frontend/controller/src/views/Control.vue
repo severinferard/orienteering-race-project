@@ -36,11 +36,11 @@
             </h3>
             <v-row>
               <v-col>
-				  <h4 class="subheading my-5">
+                  <h4 class="subheading my-5">
                   21 mars 2001
                 </h4>
                 <h4 class="subtitle-1 my-5">3 Balises enregistrées</h4>
-			</v-col>
+            </v-col>
               <v-col>
                 <h4 class="subtitle-1 my-5">Notre dame les oiseaux</h4>
                 <h4 class="subtitle-1 my-5">5ème B</h4>
