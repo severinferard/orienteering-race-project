@@ -15,10 +15,10 @@
         </h4>
       </router-link>
     </v-app-bar>
-    <v-container fluid class="fill-height" >
-        <v-overlay :absolute="true" v-model="treeLoading">
-            <v-progress-circular indeterminate size="64"></v-progress-circular>
-          </v-overlay>
+    <v-container fluid class="fill-height">
+      <v-overlay :absolute="true" v-model="treeLoading">
+        <v-progress-circular indeterminate size="64"></v-progress-circular>
+      </v-overlay>
       <v-row class="fill-height">
         <v-col cols="5" style="position: relative;">
           <v-switch label="Mémoriser l'arbre" v-model="memorizeTree"></v-switch>
@@ -178,7 +178,7 @@
                           <v-list-item-content>
                             {{ run.id }}
                           </v-list-item-content>
-                           <v-list-item-content>
+                          <v-list-item-content>
                             {{ run.date }}
                           </v-list-item-content>
                           <v-btn
@@ -408,6 +408,7 @@ export default {
   },
   methods: {
     test(e) {
+      console.log("e", e);
       this.active.push(e);
     },
     async loadSchools() {
@@ -463,7 +464,7 @@ export default {
               children: [],
               beacons: session.beacons,
               runs: sessionInfo.runs.map((run) => {
-                return { ...run, _id: session._id + run.id, date: run.date, };
+                return { ...run, _id: session._id + run.id, date: run.date };
               }),
               date: session.date,
             };
@@ -507,12 +508,12 @@ export default {
     },
     async deleteClassSendReq() {
       this.deleteDialog = false;
-      this.selected = undefined;
       await axios.delete(`/api/classes/${this.selected.id}`);
       const parent = this.itemsFlat.find((item) => item.children.includes(this.selected));
       this.itemsFlat.splice(this.items.indexOf(this.selected), 1);
       parent.classes.splice(parent.classes.indexOf(this.selected), 1);
       parent.children.splice(parent.children.indexOf(this.selected), 1);
+      this.active = [];
     },
     deleteSession() {
       this.delete.func = this.deleteSessionSendReq;
@@ -521,12 +522,13 @@ export default {
     },
     async deleteSessionSendReq() {
       this.deleteDialog = false;
-      this.selected = undefined;
       await axios.delete(`/api/sessions/${this.selected.id}`);
       const parent = this.itemsFlat.find((item) => item.children.includes(this.selected));
+      console.log("PARENT", parent);
       this.itemsFlat.splice(this.items.indexOf(this.selected), 1);
-      parent.sessions.splice(parent.classes.indexOf(this.selected), 1);
+      parent.sessions.splice(parent.sessions.indexOf(this.selected), 1);
       parent.children.splice(parent.children.indexOf(this.selected), 1);
+      this.active = [];
     },
     deleteRun(id) {
       this.delete.func = this.deleteRunSendReq;
@@ -555,6 +557,7 @@ export default {
       let item = {
         ...this.newItem,
         id: res.data.id,
+        _id: res.data.id,
         children: [],
         sessions: [],
       };
@@ -583,6 +586,7 @@ export default {
         params: { class_id: this.newItem.parent.id },
       });
       item.id = res.data.id;
+      item._id = res.data.id;
       this.newItem.parent.sessions.push(item);
       this.newItem.parent.children.push(item);
       this.itemsFlat.push(item);
@@ -705,20 +709,23 @@ export default {
       if (this.itemsFlat.length) localStorage.setItem("openedNodes", JSON.stringify(val));
     },
     selected(val) {
-      if (this.nodeTypeMap[val.id] == "run") {
-        this.$router.push(`/session/${val.parent.id}/student-recap/${val.name}`);
+      if (val) {
+        if (this.nodeTypeMap[val.id] == "run") {
+          this.$router.push(`/session/${val.parent.id}/student-recap/${val.name}`);
+        }
+        this.open.push(val.id);
       }
-      this.open.push(val.id);
     },
     memorizeTree(val) {
       localStorage.setItem("memorizeTree", JSON.stringify(val));
       if (!val) localStorage.setItem("openedNodes", JSON.stringify([]));
     },
     active(val) {
-        if (this.nodeTypeMap[val] === 'school' || this.nodeTypeMap[val] === 'session' || this.nodeTypeMap[val] === 'class') {
-            localStorage.setItem("activeNode", JSON.stringify(val));
-        }
-    }
+      console.log("active", val);
+      if (this.nodeTypeMap[val] === "school" || this.nodeTypeMap[val] === "session" || this.nodeTypeMap[val] === "class") {
+        localStorage.setItem("activeNode", JSON.stringify(val));
+      }
+    },
   },
   async created() {
     let delay = 0;
@@ -737,8 +744,8 @@ export default {
           console.log(err);
         }
       }
-    this.active = (!("activeNode" in localStorage)) ? [] : JSON.parse(localStorage.getItem("activeNode"))
-    console.log('init active', this.active)
+      this.active = !("activeNode" in localStorage) ? [] : JSON.parse(localStorage.getItem("activeNode"));
+      console.log("init active", this.active);
     }
     setTimeout(() => {
       this.treeLoading = false;
