@@ -1,163 +1,195 @@
-const express = require('express')
-const mongodb = require('mongodb')
+const express = require("express");
+const mongodb = require("mongodb");
 
-const router = express.Router()
-module.exports = router
+const router = express.Router();
+module.exports = router;
 
-router.get('/', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
+router.get("/", async (req, res) => {
+  const client = await mongodb.MongoClient.connect("mongodb://localhost:27017/", {
     useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
+    useUnifiedTopology: true,
+  });
   try {
-    const sessions = client.db('orienteering-race-project').collection('sessions')
-	const list = await sessions.find({"class_id" : mongodb.ObjectID(req.query.class_id)}).toArray()
-	const clss = await client.db('orienteering-race-project').collection('schools').findOne({"classes" : {$elemMatch: {"_id": mongodb.ObjectID(req.query.class_id)}}})
+    const sessions = client.db("orienteering-race-project").collection("sessions");
+    const list = await sessions.find({ class_id: mongodb.ObjectID(req.query.class_id) }).toArray();
+    const clss = await client
+      .db("orienteering-race-project")
+      .collection("schools")
+      .findOne({ classes: { $elemMatch: { _id: mongodb.ObjectID(req.query.class_id) } } });
     list.forEach((v) => {
-      delete v.runs
-      delete v.geosJon
-      v.id = v._id
-	})
-	let ret = {
-		class_name: clss.classes.filter(c => c._id == req.query.class_id)[0].name,
-		class_id: mongodb.ObjectID(req.query.class_id),
-		school_name: clss.name,
-		school_id: clss._id,
-		sessions: list
-	}
-    res.send(ret)
+      delete v.runs;
+      delete v.geosJon;
+      v.id = v._id;
+    });
+    let ret = {
+      class_name: clss.classes.filter((c) => c._id == req.query.class_id)[0].name,
+      class_id: mongodb.ObjectID(req.query.class_id),
+      school_name: clss.name,
+      school_id: clss._id,
+      sessions: list,
+    };
+    res.send(ret);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   } finally {
-    client.close()
+    client.close();
   }
-})
+});
 
-router.post('/', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
+router.post("/", async (req, res) => {
+  const client = await mongodb.MongoClient.connect("mongodb://localhost:27017/", {
     useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
+    useUnifiedTopology: true,
+  });
   try {
-	const sessions = client.db('orienteering-race-project').collection('sessions')
-	const clss = await client.db('orienteering-race-project').collection('schools').findOne({"classes" : {$elemMatch: {"_id": mongodb.ObjectID(req.query.class_id)}}})
+    const sessions = client.db("orienteering-race-project").collection("sessions");
+    const clss = await client
+      .db("orienteering-race-project")
+      .collection("schools")
+      .findOne({ classes: { $elemMatch: { _id: mongodb.ObjectID(req.query.class_id) } } });
     const newSession = {
-	  school_name: clss.name,
-	  school_id: clss._id,
-	  class_id: mongodb.ObjectID(req.query.class_id),
-	  class_name: clss.classes.filter(c => c._id == req.query.class_id)[0].name,
+      school_name: clss.name,
+      school_id: clss._id,
+      class_id: mongodb.ObjectID(req.query.class_id),
+      class_name: clss.classes.filter((c) => c._id == req.query.class_id)[0].name,
       session_name: req.body.session_name,
       _id: mongodb.ObjectID(),
       date: req.body.date,
       beacons: [],
-      runs: []
-	}
-	console.log("schoolname",newSession.school_name)
-	console.log("classname",newSession.class_name)
+      runs: [],
+    };
+    console.log("schoolname", newSession.school_name);
+    console.log("classname", newSession.class_name);
     sessions.insertOne(newSession, (err, res) => {
-      if (err) throw err
-      console.log('success')
-      client.close()
-	})
-	res.send({id: newSession._id})
+      if (err) throw err;
+      console.log("success");
+      client.close();
+    });
+    res.send({ id: newSession._id });
   } catch (error) {
-    console.log(error)
-    client.close()
+    console.log(error);
+    client.close();
   }
-})
+});
 
-router.get('/:session_id', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
+// Get session
+router.get("/:session_id", async (req, res) => {
+  const client = await mongodb.MongoClient.connect("mongodb://localhost:27017/", {
     useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
+    useUnifiedTopology: true,
+  });
   try {
-    const sessions = client.db('orienteering-race-project').collection('sessions')
-    const schools = client.db('orienteering-race-project').collection('schools')
-    const session = await sessions.findOne({ _id: mongodb.ObjectID(req.params.session_id) })
-    const school = await schools.findOne({ classes: {$elemMatch: {_id: mongodb.ObjectID(session.class_id)}}})
-    session.schoolId = school._id
-    res.send(session)
+    const sessions = client.db("orienteering-race-project").collection("sessions");
+    const schools = client.db("orienteering-race-project").collection("schools");
+    const session = await sessions.findOne({ _id: mongodb.ObjectID(req.params.session_id) });
+    const school = await schools.findOne({ classes: { $elemMatch: { _id: mongodb.ObjectID(session.class_id) } } });
+    session.schoolId = school._id;
+    res.send(session);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   } finally {
-    client.close()
+    client.close();
   }
-})
+});
 
-router.put('/:session_id', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
+async function deleteSession(client, session_id) {
+	const sessions = client.db("orienteering-race-project").collection("sessions");
+    const schools = client.db("orienteering-race-project").collection("schools");
+    await sessions.deleteOne({ _id: mongodb.ObjectID(session_id) });
+}
+
+//Delete session
+router.delete("/:session_id", async (req, res) => {
+  const client = await mongodb.MongoClient.connect("mongodb://localhost:27017/", {
     useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
+    useUnifiedTopology: true,
+  });
   try {
-    const sessions = client.db('orienteering-race-project').collection('sessions')
-    const myquery = { _id: mongodb.ObjectID(req.params.session_id) }
+    await deleteSession(client, req.params.session_id)
+    res.status(200).send();
+  } catch (error) {
+	console.log(error);
+	res.status(500).send()
+  } finally {
+    client.close();
+  }
+});
+
+// Edit beacon
+router.put("/:session_id/beacons", async (req, res) => {
+  const client = await mongodb.MongoClient.connect("mongodb://localhost:27017/", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  try {
+    const sessions = client.db("orienteering-race-project").collection("sessions");
+    const myquery = { _id: mongodb.ObjectID(req.params.session_id) };
     const data = {
       _id: req.body._id,
       id: req.body.id,
-      name: '',
-      coords: req.body.coords
-    }
-    console.log('coords', req.body.coords)
-    const action = { $set: { 'beacons.$[beacon]': data } }
-    const options = { arrayFilters: [{ 'beacon._id': data._id }] }
+      name: "",
+      coords: req.body.coords,
+    };
+    const action = { $set: { "beacons.$[beacon]": data } };
+    const options = { arrayFilters: [{ "beacon._id": data._id }] };
     sessions.updateOne(myquery, action, options, (err, res) => {
-      if (err) throw err
-      client.close()
-    })
-    res.status(200).send()
+      if (err) throw err;
+      client.close();
+    });
+    res.status(200).send();
   } catch (error) {
-    console.log(error)
-    res.status(500).send()
-    client.close()
+    console.log(error);
+    res.status(500).send();
+    client.close();
   }
-})
+});
 
-router.post('/:session_id', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
+// new beacon
+router.post("/:session_id/beacons", async (req, res) => {
+  const client = await mongodb.MongoClient.connect("mongodb://localhost:27017/", {
     useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
+    useUnifiedTopology: true,
+  });
   try {
-    const sessions = client.db('orienteering-race-project').collection('sessions')
-    const myquery = { _id: mongodb.ObjectID(req.params.session_id) }
+    const sessions = client.db("orienteering-race-project").collection("sessions");
+    const myquery = { _id: mongodb.ObjectID(req.params.session_id) };
     const data = {
       _id: req.body._id,
       id: req.body.id,
-      name: '',
-      coords: req.body.coords
-    }
-    const action = { $push: { beacons: data } }
+      name: "",
+      coords: req.body.coords,
+    };
+    const action = { $push: { beacons: data } };
     sessions.updateOne(myquery, action, (err, res) => {
-      if (err) throw err
-    })
-    res.status(200).send()
+      if (err) throw err;
+    });
+    res.status(200).send();
   } catch (error) {
-    console.log(error)
-    res.status(500).send()
-    client.close()
+    console.log(error);
+    res.status(500).send();
+    client.close();
   }
-})
+});
 
-router.delete('/:session_id', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
+// delete beacon
+router.delete("/:session_id/beacons", async (req, res) => {
+  const client = await mongodb.MongoClient.connect("mongodb://localhost:27017/", {
     useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
+    useUnifiedTopology: true,
+  });
   try {
-    const sessions = client.db('orienteering-race-project').collection('sessions')
-    const myquery = { _id: mongodb.ObjectID(req.params.session_id) }
-    const data = { _id: req.body._id }
-    const action = { $pull: { beacons: { _id: data._id } } }
+    const sessions = client.db("orienteering-race-project").collection("sessions");
+    const myquery = { _id: mongodb.ObjectID(req.params.session_id) };
+    const data = { _id: req.body._id };
+    const action = { $pull: { beacons: { _id: data._id } } };
     sessions.updateOne(myquery, action, (err, res) => {
-      if (err) throw err
-      client.close()
-    })
-    res.status(200).send()
+      if (err) throw err;
+      client.close();
+    });
+    res.status(200).send();
   } catch (error) {
-    console.log(error)
-    res.status(500).send()
-    client.close()
+    console.log(error);
+    res.status(500).send();
+    client.close();
   }
-})
+});

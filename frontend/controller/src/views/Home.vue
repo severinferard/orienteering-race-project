@@ -17,7 +17,7 @@
       <div class="slogan">
         <span class="display-2 white--text font-weight-thin"
           ><span class="font-weight-regular">D</span>igital
-          <span class="font-weight-regular">O</span>rienteerting <br /><span
+          <span class="font-weight-regular">O</span>rienteering <br /><span
             class="font-weight-regular"
             >R</span
           >ace <span class="font-weight-regular">A</span>pplication</span

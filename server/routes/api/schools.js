@@ -1,5 +1,6 @@
 const express = require('express')
 const mongodb = require('mongodb')
+const classTool = require('./classes.js')
 
 const router = express.Router()
 module.exports = router
@@ -15,25 +16,6 @@ router.get('/', async (req, res) => {
     const list = await collection.find({}).toArray()
     list.forEach((item) => { item.id = item._id })
     res.send(list)
-  } catch (error) {
-    console.log(error)
-  } finally {
-    client.close()
-  }
-})
-
-// Get Classes of school
-router.get('/:school_id', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  try {
-    const collection = client.db('orienteering-race-project').collection('schools')
-    const school = await collection.findOne({ _id: mongodb.ObjectID(req.params.school_id) })
-    school.id = school._id
-    school.classes.forEach(cls => { cls.id = cls._id })
-    res.send(school)
   } catch (error) {
     console.log(error)
   } finally {
@@ -67,26 +49,20 @@ router.post('/', async (req, res) => {
   }
 })
 
-// Add new class
-router.post('/:school_id', async (req, res) => {
-  const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  try {
-    const collection = client.db('orienteering-race-project').collection('schools')
-    const newClass = {
-      _id: mongodb.ObjectID(),
-      name: req.body.name
-    }
-    collection.updateOne({ _id: mongodb.ObjectID(req.params.school_id) }, { $push: { classes: newClass } }, (err, re) => {
-      if (err) throw err
-      console.log('success')
-      client.close()
-    })
-    res.status(200).send({ id: newClass._id })
-  } catch (error) {
-    console.log(error)
-    client.close()
-  }
+// Delete school
+router.delete('/:school_id', async (req, res) => {
+	console.log("delete")
+	const client = await mongodb.MongoClient.connect('mongodb://localhost:27017/', {
+		useNewUrlParser: true,
+		useUnifiedTopology: true
+	})
+	const collection = client.db('orienteering-race-project').collection('schools')
+	const school = await collection.findOne({_id: mongodb.ObjectID(req.params.school_id)})
+	await school.classes.forEach(cls => classTool.deleteClass(client, cls._id))
+	collection.deleteOne({_id: mongodb.ObjectID(req.params.school_id)}, (err, re) => {
+		client.close()
+		if (err) {console.log(err); res.status(500).send();}
+		else {res.status(200).send()}
+		console.log("done")
+	})
 })

@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <v-app-bar app color="primary" dark>
+    <v-app-bar app color="primary" dark style="">
       <v-toolbar-title>
         <router-link to="/">
           <h3 class="secondary--text text--lighten-1 font-weight-light px-4">
@@ -15,9 +15,13 @@
         </h4>
       </router-link>
     </v-app-bar>
-    <v-container fluid class="fill-height">
-      <v-row class="fill-height pa-4">
-        <v-col cols="5">
+    <v-container fluid class="fill-height" >
+        <v-overlay :absolute="true" v-model="treeLoading">
+            <v-progress-circular indeterminate size="64"></v-progress-circular>
+          </v-overlay>
+      <v-row class="fill-height">
+        <v-col cols="5" style="position: relative;">
+          <v-switch label="Mémoriser l'arbre" v-model="memorizeTree"></v-switch>
           <v-treeview
             hoverable
             transition
@@ -27,11 +31,13 @@
             :active.sync="active"
             :open.sync="open"
           ></v-treeview>
-          <v-btn @click.stop="newSchool()" style="margin-bottom: 43px" absolute bottom color="white" fab left light> <v-icon>mdi-plus</v-icon></v-btn>
+          <v-btn @click.native.stop="newSchool()" style="margin-bottom: 43px" absolute bottom color="white" fab left light>
+            <v-icon>mdi-plus</v-icon></v-btn
+          >
         </v-col>
         <v-divider vertical></v-divider>
         <v-col>
-            <!-- ===================================================================================================== No node selected page ========================= -->
+          <!-- ===================================================================================================== No node selected page ========================= -->
           <v-card v-if="!selected" flat class="pt-6">
             <v-card-text class="text-center">
               <v-img src="@/assets/left-arrow.svg" max-height="150" contain class="mb-10"></v-img>
@@ -40,6 +46,11 @@
           </v-card>
           <!-- ===================================================================================================== School page ====================================== -->
           <v-card v-else-if="nodeTypeMap[selected.id] == 'school'" class="pt-6" flat>
+            <div style="position: absolute; top: 0; right: 0">
+              <v-btn class="pa-0 ma-0" style="z-index: 4" width="60" height="60" depressed color="transparent" @click="deleteSchool">
+                <v-img contain height="30" width="30" src="@/assets/delete.svg"></v-img>
+              </v-btn>
+            </div>
             <v-card-text class="text-center">
               <v-img max-height="150" contain src="@/assets/school.svg" class="mb-6"></v-img>
               <h3 class="headline mb-2">
@@ -52,7 +63,9 @@
               <h4 class="subtitle-1 my-5">{{ selected.classes.length }} classes enregistrées</h4>
               <v-toolbar color="#46c4a1" dark dense>
                 <v-toolbar-title class="px-3">Classes</v-toolbar-title>
-                <v-btn @click.stop="newClass(selected)" absolute bottom color="white" fab right light> <v-icon>mdi-plus</v-icon></v-btn>
+                <v-btn @click.native.stop="newClass(selected)" absolute bottom color="white" fab right light>
+                  <v-icon>mdi-plus</v-icon></v-btn
+                >
               </v-toolbar>
               <v-list>
                 <v-list-item-group>
@@ -72,16 +85,23 @@
           </v-card>
           <!-- ===================================================================================================== Class page ========================= -->
           <v-card v-else-if="nodeTypeMap[selected.id] == 'class'" class="pt-6" flat>
+            <div style="position: absolute; top: 0; right: 0">
+              <v-btn class="pa-0 ma-0" style="z-index: 4" width="60" height="60" depressed color="transparent" @click="deleteClass">
+                <v-img contain height="30" width="30" src="@/assets/delete.svg"></v-img>
+              </v-btn>
+            </div>
             <v-card-text class="text-center">
               <v-img max-height="150" contain src="@/assets/teamwork.svg" class="mb-6"></v-img>
               <h3 class="headline mb-5">
                 {{ selected.name }}
               </h3>
               <v-divider></v-divider>
-              <h4 class="subtitle-1 my-5">{{ selected.sessions.length }} sessions enregistrées</h4>
+              <h4 class="subtitle-1 my-5">{{ selected.sessions.length }} séances enregistrées</h4>
               <v-toolbar color="#46c4a1" dark dense>
-                <v-toolbar-title class="px-3">Sessions</v-toolbar-title>
-                <v-btn @click.stop="newSession(selected)" absolute bottom color="white" fab right light> <v-icon>mdi-plus</v-icon></v-btn>
+                <v-toolbar-title class="px-3">Séances</v-toolbar-title>
+                <v-btn @click.native.stop="newSession(selected)" absolute bottom color="white" fab right light>
+                  <v-icon>mdi-plus</v-icon></v-btn
+                >
               </v-toolbar>
               <v-list>
                 <v-list-item-group>
@@ -103,6 +123,11 @@
           <!-- ===================================================================================================== Session page ========================= -->
           <v-card v-else-if="nodeTypeMap[selected.id] == 'session'" class="pt-6" flat>
             <div style="position: absolute; top: 0; right: 0">
+              <v-btn class="pa-0 ma-0" style="z-index: 4" width="60" height="60" depressed color="transparent" @click="deleteSession">
+                <v-img contain height="30" width="30" src="@/assets/delete.svg"></v-img>
+              </v-btn>
+            </div>
+            <div style="position: absolute; top: 0; left: 0">
               <v-btn class="pa-0 ma-0" width="60" height="60" depressed color="transparent" @click="settings = true">
                 <v-img contain height="60" width="30" src="@/assets/marker.svg"></v-img>
               </v-btn>
@@ -119,7 +144,7 @@
             </div>
             <v-row>
               <v-col cols="5">
-                <v-card-text class="text-center">
+                <v-card-text class="text-center pt-8">
                   <v-img max-height="150" contain src="@/assets/map.svg" class="mb-6"></v-img>
                 </v-card-text>
               </v-col>
@@ -153,7 +178,19 @@
                           <v-list-item-content>
                             {{ run.id }}
                           </v-list-item-content>
-                          <v-list-item-content> </v-list-item-content>
+                           <v-list-item-content>
+                            {{ run.date }}
+                          </v-list-item-content>
+                          <v-btn
+                            class="pa-0 ma-0"
+                            width="60"
+                            height="60"
+                            depressed
+                            color="transparent"
+                            @click.native.stop="deleteRun(run._id)"
+                          >
+                            <v-img contain height="30" width="30" src="@/assets/delete.svg"></v-img>
+                          </v-btn>
                         </v-list-item>
                       </v-list-item-group>
                     </v-list>
@@ -217,7 +254,7 @@
         </v-row>
       </v-card>
     </v-dialog>
-        <!-- ===================================================================================================== Beacons settings dialog ========================= -->
+    <!-- ===================================================================================================== Beacons settings dialog ========================= -->
     <v-dialog v-model="settings" fullscreen hide-overlay transition="dialog-bottom-transition">
       <v-card>
         <v-toolbar dark color="primary">
@@ -282,7 +319,7 @@
         </template>
       </v-snackbar>
     </v-dialog>
-          <v-dialog v-model="newSchoolDialog" width="50%">
+    <v-dialog v-model="newSchoolDialog" width="50%">
       <v-card>
         <v-row>
           <v-col><v-text-field v-model="newItem.name" class="mx-4" label="Nom de l'établissement"></v-text-field></v-col>
@@ -293,6 +330,36 @@
             <v-btn @click="newSchoolSendPostRequest()">Créer</v-btn>
           </v-col>
         </v-row>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="deleteDialog" width="500">
+      <v-card>
+        <v-card-title class="headline"> Supprimer {{ selected ? selected.name : "" }} ? </v-card-title>
+
+        <v-card-text v-if="this.delete.type === 'school'">
+          Vous êtes sur le point de supprimer l'établissement "{{ selected ? selected.name : "" }}", cela entrainera la suppression de
+          toutes les classes, séances, et données relative à "{{ selected ? selected.name : "" }}". Voulez vous continuer ?
+        </v-card-text>
+        <v-card-text v-else-if="this.delete.type === 'class'">
+          Vous êtes sur le point de supprimer la classe "{{ selected ? selected.name : "" }}", cela entrainera la suppression de toutes les
+          séances, et données relative à "{{ selected ? selected.name : "" }}". Voulez vous continuer ?
+        </v-card-text>
+        <v-card-text v-else-if="this.delete.type === 'session'">
+          Vous êtes sur le point de supprimer la séance "{{ selected ? selected.name : "" }}", cela entrainera la suppression de toutes les
+          données relative à "{{ selected ? selected.name : "" }}". Voulez vous continuer ?
+        </v-card-text>
+        <v-card-text v-else-if="this.delete.type === 'run'">
+          Vous êtes sur le point de supprimer "{{ selected ? selected.name : "" }}" de cette séance, cela entrainera la suppression de
+          toutes les données de "{{ selected ? selected.name : "" }}" relatives à cette séance. Voulez vous continuer ?
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="deleteDialog = false"> Annuler </v-btn>
+          <v-btn color="primary" text @click="this.delete.func"> Oui, supprimer </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </v-main>
@@ -333,6 +400,10 @@ export default {
       snackbar: false,
       axiosSuccess: false,
       dateMenu: false,
+      deleteDialog: false,
+      delete: { func: null, type: "" },
+      memorizeTree: true,
+      treeLoading: true,
     };
   },
   methods: {
@@ -360,7 +431,9 @@ export default {
 
       switch (this.nodeTypeMap[parent.id]) {
         case "school":
-          res = await axios.get(`/api/schools/${parent.id}`);
+          console.log("loadNode school");
+          res = await axios.get(`/api/classes/${parent.id}`);
+          console.log("classes", res.data.classes);
           for (const clss of res.data.classes) {
             this.nodeTypeMap[clss.id] = "class";
             let res = await axios.get(`/api/sessions/`, {
@@ -372,6 +445,7 @@ export default {
               sessions: res.data.sessions,
               children: [],
             };
+            console.log("adding class");
             this.itemsFlat.push(item);
             parent.children.push(item);
           }
@@ -389,7 +463,7 @@ export default {
               children: [],
               beacons: session.beacons,
               runs: sessionInfo.runs.map((run) => {
-                return { ...run, _id: session._id + run.id };
+                return { ...run, _id: session._id + run.id, date: run.date, };
               }),
               date: session.date,
             };
@@ -413,24 +487,80 @@ export default {
           });
       }
     },
+    deleteSchool() {
+      this.delete.func = this.deleteSchoolSendReq;
+      this.delete.type = "school";
+      this.deleteDialog = true;
+    },
+    async deleteSchoolSendReq() {
+      this.deleteDialog = false;
+      console.log(this.selected);
+      await axios.delete(`/api/schools/${this.selected.id}`);
+      console.log("here");
+      this.items.splice(this.items.indexOf(this.selected), 1);
+      this.itemsFlat.splice(this.items.indexOf(this.selected), 1);
+    },
+    deleteClass() {
+      this.delete.func = this.deleteClassSendReq;
+      this.delete.type = "class";
+      this.deleteDialog = true;
+    },
+    async deleteClassSendReq() {
+      this.deleteDialog = false;
+      this.selected = undefined;
+      await axios.delete(`/api/classes/${this.selected.id}`);
+      const parent = this.itemsFlat.find((item) => item.children.includes(this.selected));
+      this.itemsFlat.splice(this.items.indexOf(this.selected), 1);
+      parent.classes.splice(parent.classes.indexOf(this.selected), 1);
+      parent.children.splice(parent.children.indexOf(this.selected), 1);
+    },
+    deleteSession() {
+      this.delete.func = this.deleteSessionSendReq;
+      this.delete.type = "session";
+      this.deleteDialog = true;
+    },
+    async deleteSessionSendReq() {
+      this.deleteDialog = false;
+      this.selected = undefined;
+      await axios.delete(`/api/sessions/${this.selected.id}`);
+      const parent = this.itemsFlat.find((item) => item.children.includes(this.selected));
+      this.itemsFlat.splice(this.items.indexOf(this.selected), 1);
+      parent.sessions.splice(parent.classes.indexOf(this.selected), 1);
+      parent.children.splice(parent.children.indexOf(this.selected), 1);
+    },
+    deleteRun(id) {
+      this.delete.func = this.deleteRunSendReq;
+      this.delete.type = "run";
+      this.delete.id = id;
+      this.deleteDialog = true;
+    },
+    async deleteRunSendReq() {
+      this.deleteDialog = false;
+      const session = this.selected;
+      const run = session.children.find((run) => run.id === this.delete.id);
+      await axios.delete(`/api/runs/${this.selected.id}/${run.name}`);
+      session.runs.splice(session.runs.indexOf(session.runs.find((e) => e.id === run.name)), 1);
+      session.children.splice(session.children.indexOf(run), 1);
+    },
     // ==================================================================================== New class =================================
     newClass(parent) {
       this.newItem = { parent: parent, name: "" };
       this.newClassDialog = true;
-      console.log("parent", parent)
     },
     async newClassSendPost() {
+      const parent = this.newItem.parent;
+      delete this.newItem.parent;
       this.newClassDialog = false;
-      const res = await axios.post(`/api/schools/${this.newItem.parent.id}`, this.newItem);
+      const res = await axios.post(`/api/classes/${parent.id}`, this.newItem);
       let item = {
         ...this.newItem,
         id: res.data.id,
         children: [],
         sessions: [],
       };
-      console.log('adding to', this.itemsFlat.find((e) => (e.id == this.newItem.parent.id)))
-      this.itemsFlat.find((e) => (e.id == this.newItem.parent.id)).classes.push(item);
-      this.itemsFlat.find((e) => (e.id == this.newItem.parent.id)).children.push(item);
+      console.log("parent", parent);
+      this.itemsFlat.find((e) => e.id == parent.id).classes.push(item);
+      this.itemsFlat.find((e) => e.id == parent.id).children.push(item);
       this.itemsFlat.push(item);
       this.nodeTypeMap[item.id] = "class";
     },
@@ -473,7 +603,7 @@ export default {
     async saveChange() {
       this.dialog = false;
       try {
-        await axios.put(`/api/sessions/${this.selected.id}/`, {
+        await axios.put(`/api/sessions/${this.selected.id}/beacons`, {
           _id: this.editedItem._id,
           id: parseInt(this.editedItem.id),
           coords: [parseFloat(this.editedItem.lat), parseFloat(this.editedItem.long)],
@@ -497,7 +627,7 @@ export default {
         .toString(36)
         .slice(-5);
       try {
-        await axios.post(`/api/sessions/${this.selected.id}/`, {
+        await axios.post(`/api/sessions/${this.selected.id}/beacons`, {
           _id: this.editedItem._id,
           id: parseInt(this.editedItem.id),
           coords: [parseFloat(this.editedItem.lat), parseFloat(this.editedItem.long)],
@@ -520,7 +650,7 @@ export default {
     async deleteItem(item) {
       this.selected.beacons.splice(this.selected.beacons.indexOf(item), 1);
       try {
-        await axios.delete(`/api/sessions/${this.selected.id}/`, {
+        await axios.delete(`/api/sessions/${this.selected.id}/beacons`, {
           data: { _id: item._id },
         });
         this.axiosSuccess = true;
@@ -534,18 +664,18 @@ export default {
       }
     },
     newSchool() {
-            this.newItem = {name: "", city: "", classes: ""}
-            this.newSchoolDialog = true
-        },
+      this.newItem = { name: "", city: "", classes: [], children: [] };
+      this.newSchoolDialog = true;
+    },
     async newSchoolSendPostRequest() {
-            this.newSchoolDialog = false
-            const res = await axios.post(`/api/schools/`, this.newItem)
-            this.newItem.id = res.data.id
-            this.itemsFlat.push(this.newItem)
-            this.items.push(this.newItem)
-            this.nodeTypeMap[this.newItem.id] = 'school'
-            console.log(this.newItem)
-        }
+      this.newSchoolDialog = false;
+      const res = await axios.post(`/api/schools/`, this.newItem);
+      this.newItem.id = res.data.id;
+      this.itemsFlat.push(this.newItem);
+      this.items.push(this.newItem);
+      this.nodeTypeMap[this.newItem.id] = "school";
+      console.log(this.newItem);
+    },
   },
   computed: {
     selected() {
@@ -571,24 +701,48 @@ export default {
     },
   },
   watch: {
-    //   open(val) {
-    //       console.log("open changed", val)
-    //       if (this.itemsFlat.length)
-    //         localStorage.setItem('openedNodes', JSON.stringify(val));
-    //        console.log("openedNodes", localStorage.getItem('openedNodes'))
-    //   },
+    open(val) {
+      if (this.itemsFlat.length) localStorage.setItem("openedNodes", JSON.stringify(val));
+    },
     selected(val) {
       if (this.nodeTypeMap[val.id] == "run") {
         this.$router.push(`/session/${val.parent.id}/student-recap/${val.name}`);
       }
       this.open.push(val.id);
     },
+    memorizeTree(val) {
+      localStorage.setItem("memorizeTree", JSON.stringify(val));
+      if (!val) localStorage.setItem("openedNodes", JSON.stringify([]));
+    },
+    active(val) {
+        if (this.nodeTypeMap[val] === 'school' || this.nodeTypeMap[val] === 'session' || this.nodeTypeMap[val] === 'class') {
+            localStorage.setItem("activeNode", JSON.stringify(val));
+        }
+    }
   },
-  async mounted() {
+  async created() {
+    let delay = 0;
+    if (!("memorizeTree" in localStorage)) localStorage.setItem("memorizeTree", JSON.stringify(true));
+    this.memorizeTree = JSON.parse(localStorage.getItem("memorizeTree"));
     await this.loadSchools();
-    // console.log(this.itemsFlat)
-    // console.log("openedNodes load", localStorage.getItem('openedNodes'))
-    // this.open = JSON.parse(localStorage.getItem('openedNodes'))
+    if (this.memorizeTree) {
+      delay = 500;
+      let toRender = [...new Set(JSON.parse(localStorage.getItem("openedNodes")))];
+      for (const id of toRender) {
+        try {
+          let node = this.itemsFlat.find((e) => e.id === id);
+          await this.loadNode(node);
+          this.open.push(node.id);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    this.active = (!("activeNode" in localStorage)) ? [] : JSON.parse(localStorage.getItem("activeNode"))
+    console.log('init active', this.active)
+    }
+    setTimeout(() => {
+      this.treeLoading = false;
+    }, delay);
   },
 };
 </script>

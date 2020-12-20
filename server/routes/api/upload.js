@@ -27,7 +27,8 @@ router.post('/', async (req, res) => {
     sampleRate: rawData.sampleRate,
     rawPositions: rawData.data.map(coord => [coord[1], coord[0]]),
     comment: '',
-    rating: null
+	rating: null,
+	date: new Date().toLocaleString('fr-FR')
   }
   sessions.updateOne({ _id: currentSession._id }, { $push: { runs: obj } })
   console.log("Added data to DB");

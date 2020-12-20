@@ -16,6 +16,7 @@ const runs = require('./routes/api/runs')
 const upload = require('./routes/api/upload')
 const teacher = require('./routes/api/teacher')
 const schools = require('./routes/api/schools')
+const classes = require('./routes/api/classes').classes
 // const router = require('./routes/api/upload')
 const studentSummary = require('./routes/api/studentSummary')
 
@@ -24,8 +25,9 @@ app.use('/api/runs', runs)
 app.use('/api/upload', upload)
 app.use('/api/teacher', teacher)
 app.use('/api/schools', schools)
+app.use('/api/classes', classes)
 app.use('/api/student-summary', studentSummary)
-
+app.use('/atlas', express.static('atlas'))
 
 if (process.env.NODE_ENV === 'production') {
 // if (true) {

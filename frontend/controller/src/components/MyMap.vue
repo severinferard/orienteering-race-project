@@ -3,22 +3,12 @@
     <div id="map"></div>
     <div class="ui-overlay" id="left-meter">
       <v-card flat color="transparent" width="100%">
-        <StudentDataCard
-          :value="distance"
-          :percent="(distance / bestDistance) * 100"
-          title="Distance"
-          unit="m"
-        ></StudentDataCard>
+        <StudentDataCard :value="distance" :percent="(distance / bestDistance) * 100" title="Distance" unit="m"></StudentDataCard>
       </v-card>
     </div>
     <div class="ui-overlay" id="right-meter">
       <v-card flat color="transparent" width="100%">
-        <StudentDataCard
-          :value="formatedChrono"
-          :percent="(bestChrono / chrono) * 100"
-          title="Chrono"
-          :unit="null"
-        ></StudentDataCard>
+        <StudentDataCard :value="formatedChrono" :percent="(bestChrono / chrono) * 100" title="Chrono" :unit="null"></StudentDataCard>
       </v-card>
     </div>
     <div class="ui-overlay" id="bar">
@@ -57,7 +47,6 @@ import L from "leaflet";
 import StudentDataCard from "@/components/StudentDataCard.vue";
 import StudentDataBar from "@/components/StudentDataBar.vue";
 import StudentGraphCard from "@/components/StudentGraphCard.vue";
-// import image from '@/assets/logo.png'
 
 export default {
   components: {
@@ -77,16 +66,17 @@ export default {
       speeds: [],
       beacons: [],
       mapCenter: [],
-      sampleRate: 0
+      sampleRate: 0,
     };
   },
   methods: {
     setupLeaflet() {
       let map = L.map("map");
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-		// L.tileLayer("file:///Users/severin/Downloads/Mobile%20Atlas%20Creator%202/atlases/4uMaps/{z}/{x}/{y}.png", { 
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      //L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      L.tileLayer("http://localhost:5000/atlas/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 18,
+        maxNativeZoom: 15,
       }).addTo(map);
       document.on;
       map.scrollWheelZoom.disable();
@@ -95,6 +85,9 @@ export default {
       });
       map.on("blur", () => {
         map.scrollWheelZoom.disable();
+      });
+      map.on("zoom", () => {
+        console.log("zoom");
       });
 
       delete L.Icon.Default.prototype._getIconUrl;
@@ -110,16 +103,14 @@ export default {
     addGeoJson(geojson) {
       let iconValided = L.divIcon({
         className: "custom-div-icon",
-        html:
-          "<div class='marker-pin-valided'></div><i class='material-icons'>checkbox-marked</i>",
+        html: "<div class='marker-pin-valided'></div><i class='material-icons'>checkbox-marked</i>",
         iconSize: [30, 42],
         iconAnchor: [15, 42],
       });
 
       let iconNotValided = L.divIcon({
         className: "custom-div-icon",
-        html:
-          "<div class='marker-pin-not-valided'></div><i class='material-icons'>close-box</i>",
+        html: "<div class='marker-pin-not-valided'></div><i class='material-icons'>close-box</i>",
         iconSize: [30, 42],
         iconAnchor: [15, 42],
         shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
@@ -139,53 +130,46 @@ export default {
       rainbowvis.setNumberRange(0, 10);
       rainbowvis.setSpectrum("red", "orange", "green");
       L.geoJSON(geojson, {
-        pointToLayer: function (feature, latlng) {
+        pointToLayer: function(feature, latlng) {
           return L.marker(latlng, { icon: iconValided });
         },
-        filter: function (feature, layer) {
+        filter: function(feature, layer) {
           console.log(feature.properties.valided, layer);
           return feature.properties.valided;
         },
       }).addTo(this.map);
       L.geoJSON(geojson, {
-        pointToLayer: function (feature, latlng) {
+        pointToLayer: function(feature, latlng) {
           return L.marker(latlng, { icon: iconNotValided });
         },
-        filter: function (feature) {
-          return (
-            feature.geometry.type === "Point" && !feature.properties.valided
-          );
+        filter: function(feature) {
+          return feature.geometry.type === "Point" && !feature.properties.valided;
         },
       }).addTo(this.map);
       L.geoJSON(geojson, {
-        style: function (feature) {
+        style: function(feature) {
           return {
             color: "#" + rainbowvis.colorAt(feature.properties.speed),
             weight: 5,
           };
         },
-        filter: function (feature) {
-          return (
-            feature.geometry.type === "LineString" &&
-            !feature.properties.valided
-          );
+        filter: function(feature) {
+          return feature.geometry.type === "LineString" && !feature.properties.valided;
         },
       }).addTo(this.map);
     },
     async loadData() {
       this.loadingData = true;
       try {
-        const res = await axios.get(
-          `/api/runs/${this.$route.params.session_id}/${this.$route.params.student_id}`
-		);
+        const res = await axios.get(`/api/runs/${this.$route.params.session_id}/${this.$route.params.student_id}`);
         const data = res.data;
         console.log("data", data);
-		this.beacons = data.beacons;
+        this.beacons = data.beacons;
         this.id = data.id;
         this.chrono = data.time;
         this.sampleRate = data.sampleRate;
         this.bestChrono = data.bestTime;
-        console.log((this.bestChrono / this.chrono) * 100)
+        console.log((this.bestChrono / this.chrono) * 100);
         this.averageSpeed = data.avgSpeed.toFixed(1);
         this.distance = data.distance.toFixed();
         this.bestDistance = data.bestDistance.toFixed();
@@ -193,7 +177,7 @@ export default {
         this.geoJson = data.geoJson;
         this.mapCenter = data.beacons[0].coords;
         this.addGeoJson(this.geoJson);
-        this.map.setView([this.mapCenter[1], this.mapCenter[0]], 16)
+        this.map.setView([this.mapCenter[1], this.mapCenter[0]], 16);
       } catch (error) {
         console.log(error);
       }
@@ -201,12 +185,17 @@ export default {
     },
   },
   computed: {
-      formatedChrono() {
-          return (this.chrono < 60 ? '0' :  (this.chrono / 60).toFixed()) + ':' + ((this.chrono % 60).toFixed() < 10 ? '0' : '') + (this.chrono % 60).toFixed()
-      }
+    formatedChrono() {
+      return (
+        (this.chrono < 60 ? "0" : (this.chrono / 60).toFixed()) +
+        ":" +
+        ((this.chrono % 60).toFixed() < 10 ? "0" : "") +
+        (this.chrono % 60).toFixed()
+      );
+    },
   },
   created() {
-      this.loadData();
+    this.loadData();
   },
   mounted() {
     this.setupLeaflet();
@@ -245,7 +234,7 @@ export default {
 }
 
 #graph {
-    height: 210px;
+  height: 210px;
   top: 40px;
   width: 800px;
   left: 50%;

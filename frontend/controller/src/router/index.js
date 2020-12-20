@@ -9,6 +9,7 @@ import SchoolsPage from '../views/Schools.vue'
 import ClassesPage from '../views/Classes.vue'
 import StudentSummary from '../views/StudentSummary.vue'
 import Tree from '../views/Tree.vue'
+import ControlPage from '../views/Control.vue'
 
 import 'leaflet/dist/leaflet.css';
 
@@ -68,6 +69,11 @@ const routes = [
     path: '/tree',
     name: 'tree',
     component: Tree
+  },
+  {
+      path: '/control',
+      name: 'control',
+      component: ControlPage
   }
 ]
 
