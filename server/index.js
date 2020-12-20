@@ -29,8 +29,8 @@ app.use('/api/classes', classes)
 app.use('/api/student-summary', studentSummary)
 app.use('/atlas', express.static('atlas'))
 
-if (process.env.NODE_ENV === 'production') {
-// if (true) {
+//if (process.env.NODE_ENV === 'production') {
+ if (true) {
     console.log('production')
     app.use(express.static(__dirname + '/public/'))
     app.get(/.*/, (req, res) => {
