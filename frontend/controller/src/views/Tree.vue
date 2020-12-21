@@ -457,6 +457,7 @@ export default {
           });
           for (const session of res.data.sessions) {
             let sessionInfo = (await axios.get(`/api/sessions/${session.id}`)).data;
+            console.log("TEST", sessionInfo.runs)
             this.nodeTypeMap[session.id] = "session";
             let item = {
               id: session._id,
@@ -464,7 +465,7 @@ export default {
               children: [],
               beacons: session.beacons,
               runs: sessionInfo.runs.map((run) => {
-                return { ...run, _id: session._id + run.id, date: run.date };
+                return { ...run, date: run.date };
               }),
               date: session.date,
             };
@@ -475,14 +476,15 @@ export default {
         case "session":
           res = await axios.get(`/api/sessions/${parent.id}`);
           parent.children = res.data.runs.map((run) => {
-            let id = parent.id + run.id;
-            this.nodeTypeMap[id] = "run";
+            // let id = parent.id + run.id;
+            this.nodeTypeMap[run._id] = "run";
             let item = {
-              id: id,
+              id: run._id,
               name: run.id,
               parent: parent,
-              //   children: []
+                children: []
             };
+            console.log("item", item)
             this.itemsFlat.push(item);
             return item;
           });
@@ -509,7 +511,8 @@ export default {
     async deleteClassSendReq() {
       this.deleteDialog = false;
       await axios.delete(`/api/classes/${this.selected.id}`);
-      const parent = this.itemsFlat.find((item) => item.children.includes(this.selected));
+      console.log(this.itemsFlat)
+      const parent = this.itemsFlat.filter((item) => item.children.includes(this.selected))[0];
       this.itemsFlat.splice(this.items.indexOf(this.selected), 1);
       parent.classes.splice(parent.classes.indexOf(this.selected), 1);
       parent.children.splice(parent.children.indexOf(this.selected), 1);
@@ -540,8 +543,8 @@ export default {
       this.deleteDialog = false;
       const session = this.selected;
       const run = session.children.find((run) => run.id === this.delete.id);
-      await axios.delete(`/api/runs/${this.selected.id}/${run.name}`);
-      session.runs.splice(session.runs.indexOf(session.runs.find((e) => e.id === run.name)), 1);
+      await axios.delete(`/api/runs/${this.selected.id}/${run.id}`);
+      session.runs.splice(session.runs.indexOf(session.runs.find((e) => e.id === run.id)), 1);
       session.children.splice(session.children.indexOf(run), 1);
     },
     // ==================================================================================== New class =================================
@@ -711,7 +714,7 @@ export default {
     selected(val) {
       if (val) {
         if (this.nodeTypeMap[val.id] == "run") {
-          this.$router.push(`/session/${val.parent.id}/student-recap/${val.name}`);
+          this.$router.push(`/session/${val.parent.id}/student-recap/${val.id}`);
         }
         this.open.push(val.id);
       }

@@ -22,6 +22,7 @@ router.post('/', async (req, res) => {
   const currentSession = (await sessions.find().limit(1).sort({ $natural: -1 }).toArray())[0]
   const rawData = req.body
   const obj = {
+	_id: mongodb.ObjectID(),
     id: rawData.id,
     firmwareVersion: rawData.firmwareVersion,
     sampleRate: rawData.sampleRate,

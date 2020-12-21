@@ -15,8 +15,11 @@ router.get("/:session_id/:student_id", async (req, res) => {
   });
   try {
     const sessions = client.db("orienteering-race-project").collection("sessions");
-    const session = (await sessions.find({ _id: mongodb.ObjectID(req.params.session_id) }).toArray())[0];
-    const run = session.runs.filter((run) => run.id === req.params.student_id)[0];
+	const session = (await sessions.find({ _id: mongodb.ObjectID(req.params.session_id) }).toArray())[0];
+	console.log('session', session.session_name)
+	console.log('student_id', req.params.student_id)
+	console.log(session.runs[0]._id)
+    const run = session.runs.find((run) => run._id == req.params.student_id);
     const sessionBeacons = session.beacons;
     const beaconRange = 10;
     run.class_name = session.class_name;
@@ -57,7 +60,7 @@ router.post("/:session_id/:student_id", async (req, res) => {
         "runs.$[run].rating": req.body.rating,
       },
     };
-    const options = { arrayFilters: [{ "run.id": req.params.student_id }] };
+    const options = { arrayFilters: [{ "run._id": mongodb.ObjectID(req.params.student_id) }] };
     sessions.updateOne(myquery, newvalues, options, (err, res) => {
       if (err) throw err;
       client.close();
@@ -71,13 +74,14 @@ router.post("/:session_id/:student_id", async (req, res) => {
 
 // Delete run
 router.delete("/:session_id/:student_id", async (req, res) => {
+	console.log('std_id',req.params.student_id )
   const client = await mongodb.MongoClient.connect("mongodb://localhost:27017/", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
   try {
     const sessions = client.db("orienteering-race-project").collection("sessions");
-    sessions.updateOne({ _id: mongodb.ObjectID(req.params.session_id) }, { $pull: { runs: { id: req.params.student_id } } }, (err, res) => {
+    sessions.updateOne({ _id: mongodb.ObjectID(req.params.session_id) }, { $pull: { runs: { _id: mongodb.ObjectID(req.params.student_id) } } }, (err, res) => {
       if (err) throw err;
       client.close();
     });
