@@ -36,6 +36,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+// New session
 router.post("/", async (req, res) => {
   const client = await mongodb.MongoClient.connect("mongodb://localhost:27017/", {
     useNewUrlParser: true,
@@ -56,7 +57,8 @@ router.post("/", async (req, res) => {
       _id: mongodb.ObjectID(),
       date: req.body.date,
       beacons: [],
-      runs: [],
+	  runs: [],
+	  isSelected: false
     };
     console.log("schoolname", newSession.school_name);
     console.log("classname", newSession.class_name);
@@ -83,7 +85,8 @@ router.get("/:session_id", async (req, res) => {
     const schools = client.db("orienteering-race-project").collection("schools");
     const session = await sessions.findOne({ _id: mongodb.ObjectID(req.params.session_id) });
     const school = await schools.findOne({ classes: { $elemMatch: { _id: mongodb.ObjectID(session.class_id) } } });
-    session.schoolId = school._id;
+	session.schoolId = school._id;
+	console.log("session", session)
     res.send(session);
   } catch (error) {
     console.log(error);

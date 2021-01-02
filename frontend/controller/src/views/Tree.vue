@@ -22,15 +22,11 @@
       <v-row class="fill-height">
         <v-col cols="5" style="position: relative;">
           <v-switch label="Mémoriser l'arbre" v-model="memorizeTree"></v-switch>
-          <v-treeview
-            hoverable
-            transition
-            activatable
-            :items="items"
-            :load-children="loadNode"
-            :active.sync="active"
-            :open.sync="open"
-          ></v-treeview>
+          <v-treeview hoverable transition activatable :items="items" :load-children="loadNode" :active.sync="active" :open.sync="open">
+            <template v-slot:append="{ item }">
+             <v-img v-if="treeBookmark(item)" src="@/assets/bookmark.svg" height="30" max-width="30" contain></v-img>
+            </template>
+          </v-treeview>
           <v-btn @click.native.stop="newSchool()" style="margin-bottom: 43px" absolute bottom color="white" fab left light>
             <v-icon>mdi-plus</v-icon></v-btn
           >
@@ -147,6 +143,9 @@
                 <v-card-text class="text-center pt-8">
                   <v-img max-height="150" contain src="@/assets/map.svg" class="mb-6"></v-img>
                 </v-card-text>
+                <v-radio-group @change="changeSelectedSession(selected.id)" :value="this.selected.isSelected ? '1' : '0'">
+                  <v-radio key="1" value="1" label="Télecharger dans cette séance"></v-radio>
+                </v-radio-group>
               </v-col>
               <v-col>
                 <v-card-text class="text-center">
@@ -457,7 +456,7 @@ export default {
           });
           for (const session of res.data.sessions) {
             let sessionInfo = (await axios.get(`/api/sessions/${session.id}`)).data;
-            console.log("TEST", sessionInfo.runs)
+            console.log("TEST", sessionInfo.runs);
             this.nodeTypeMap[session.id] = "session";
             let item = {
               id: session._id,
@@ -468,9 +467,11 @@ export default {
                 return { ...run, date: run.date };
               }),
               date: session.date,
+              isSelected: session.isSelected,
             };
             this.itemsFlat.push(item);
             parent.children.push(item);
+            console.log("isSELECTED", item.isSelected);
           }
           break;
         case "session":
@@ -482,9 +483,9 @@ export default {
               id: run._id,
               name: run.id,
               parent: parent,
-                children: []
+              children: [],
             };
-            console.log("item", item)
+            console.log("item", item);
             this.itemsFlat.push(item);
             return item;
           });
@@ -511,7 +512,7 @@ export default {
     async deleteClassSendReq() {
       this.deleteDialog = false;
       await axios.delete(`/api/classes/${this.selected.id}`);
-      console.log(this.itemsFlat)
+      console.log(this.itemsFlat);
       const parent = this.itemsFlat.filter((item) => item.children.includes(this.selected))[0];
       this.itemsFlat.splice(this.items.indexOf(this.selected), 1);
       parent.classes.splice(parent.classes.indexOf(this.selected), 1);
@@ -683,6 +684,27 @@ export default {
       this.nodeTypeMap[this.newItem.id] = "school";
       console.log(this.newItem);
     },
+    treeBookmark(item) {
+      if (this.nodeTypeMap[item.id] === "session") {
+        if (item.isSelected) {
+          return true;
+        }
+      }
+      return false;
+    },
+    isTargetedSession(e) {
+        return e.isSelected
+    },
+    async changeSelectedSession(target) {
+      console.log("changeSelectedSession", target, this.targetedSession);
+      await axios.post(`/api/targetSession/`, {id: target});
+        this.itemsFlat.forEach((e) => {
+          if (this.nodeTypeMap[e.id] === "session")
+            e.isSelected = false;
+        });
+        this.itemsFlat.find((e) => e.id === target).isSelected = true;
+
+    },
   },
   computed: {
     selected() {
@@ -705,6 +727,13 @@ export default {
         });
       }
       return null;
+    },
+    targetedSession() {
+        console.log(this.selected)
+      let sessions = this.itemsFlat.filter((e) => this.nodeTypeMap[e.id] === "session");
+      let target = sessions.find((e) => e.isSelected);
+      console.log("TARGET SESSION", target !== undefined ? target.id : undefined);
+      return target !== undefined ? target.id : undefined;
     },
   },
   watch: {
