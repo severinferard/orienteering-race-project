@@ -21,19 +21,26 @@ class DataLoader {
     })
   }
 
+  static getDistancesFromPoints (points, sampleRate) {
+    return points.map((point, index) => {
+      if (index === 0) return 0
+      return turfDistance(point, points[index - 1])
+    })
+  }
+
   static getDistanceFromPoints (points) {
     const dists = points.map((point, index) => {
       if (index === 0) return 0
       return turfDistance(point, points[index - 1]) * 1000
-	})
-	if (!dists.length)
-		return []
+    })
+    if (!dists.length)
+        return []
     return dists.reduce((a, b) => a + b)
   }
 
   static getAverageSpeed (speeds) {
-	  if (!speeds.length)
-	  	return -1;
+      if (!speeds.length)
+          return -1;
     return speeds.reduce((a, b) => a + b) / speeds.length
   }
 
@@ -60,6 +67,7 @@ class DataLoader {
           const lastValided = DataLoader.getLastValidedBeacon(mybeacons)
           const _speeds = speeds.slice(lastValided.time / sampleRate - 1 || 0, pi + 1)
           beacon.avgSpeed = _speeds.reduce((a, b) => a + b) / _speeds.length
+          beacon.distance = DataLoader.getDistancesFromPoints(points, sampleRate).slice(lastValided.time / sampleRate - 1 || 0, pi + 1).reduce((a, b) => a + b)
           beacon.valided = true
           beacon.time = pi * sampleRate + 1
           beacon.lap = beacon.time - lastValided.time || beacon.time

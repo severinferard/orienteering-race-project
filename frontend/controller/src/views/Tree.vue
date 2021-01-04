@@ -81,6 +81,18 @@
           </v-card>
           <!-- ===================================================================================================== Class page ========================= -->
           <v-card v-else-if="nodeTypeMap[selected.id] == 'class'" class="pt-6" flat>
+            <div style="position: absolute; top: 0; left: 0">
+                <v-btn
+                class="pa-0 ma-0"
+                width="60"
+                height="60"
+                depressed
+                color="transparent"
+                @click="downloadExcelClass(selected.id)"
+              >
+                <v-img contain width="30" height="60" src="@/assets/excel.svg"></v-img>
+              </v-btn>
+            </div>
             <div style="position: absolute; top: 0; right: 0">
               <v-btn class="pa-0 ma-0" style="z-index: 4" width="60" height="60" depressed color="transparent" @click="deleteClass">
                 <v-img contain height="30" width="30" src="@/assets/delete.svg"></v-img>
@@ -136,6 +148,16 @@
                 @click="$router.push(`/session/${selected.id}/teacher-recap`)"
               >
                 <v-img contain width="30" height="60" src="@/assets/whistle.svg"></v-img>
+              </v-btn>
+                <v-btn
+                class="pa-0 ma-0"
+                width="60"
+                height="60"
+                depressed
+                color="transparent"
+                @click="downloadExcelSession(selected.id)"
+              >
+                <v-img contain width="30" height="60" src="@/assets/excel.svg"></v-img>
               </v-btn>
             </div>
             <v-row>
@@ -704,6 +726,24 @@ export default {
         });
         this.itemsFlat.find((e) => e.id === target).isSelected = true;
 
+    },
+        async downloadExcelSession(session_id) {
+      const res = await axios.get(`/api/excel/session/${session_id}/`, { responseType: "blob" });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", res.headers["content-disposition"].split("filename=")[1]);
+      document.body.appendChild(link);
+      link.click();
+    },
+    async downloadExcelClass(class_id) {
+      const res = await axios.get(`/api/excel/class/${class_id}/`, { responseType: "blob" });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", res.headers["content-disposition"].split("filename=")[1]);
+      document.body.appendChild(link);
+      link.click();
     },
   },
   computed: {

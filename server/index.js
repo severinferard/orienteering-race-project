@@ -20,6 +20,7 @@ const classes = require('./routes/api/classes').classes
 // const router = require('./routes/api/upload')
 const studentSummary = require('./routes/api/studentSummary')
 const targetSession = require('./routes/api/targetSession')
+const excelCreator = require('./routes/api/excelCreator')
 
 app.use('/api/sessions', sessions)
 app.use('/api/runs', runs)
@@ -29,6 +30,7 @@ app.use('/api/schools', schools)
 app.use('/api/classes', classes)
 app.use('/api/student-summary', studentSummary)
 app.use('/api/targetSession', targetSession)
+app.use('/api/excel', excelCreator)
 app.use('/atlas', express.static('atlas'))
 
 //if (process.env.NODE_ENV === 'production') {
