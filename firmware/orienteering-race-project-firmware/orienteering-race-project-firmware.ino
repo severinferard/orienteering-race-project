@@ -5,10 +5,13 @@
 #include "SPIFFS.h"
 #include <Ticker.h>
 
-#define SERVER_IP           "10.0.60.1"
-#define WIFI_SSID           "Movuino"
-#define WIFI_PASSWORD       "movuino2020"
-#define MOV_ID              "mov01"
+//#define SERVER_IP           "10.0.60.1"
+//#define WIFI_SSID           "Movuino"
+//#define WIFI_PASSWORD       "movuino2020"
+#define SERVER_IP           "10.12.181.117"
+#define WIFI_SSID           "CRI-MAKERLAB"
+#define WIFI_PASSWORD       "--criMAKER--"
+#define MOV_ID              "mov02"
 #define FIRMWARE_VERSION    "1.0"
 #define SAMPLE_RATE         "0.1"
 
@@ -17,6 +20,7 @@
 #define RXD2                38
 #define TXD2                39
 #define buttonPin           13
+#define READ_BUFFER_SIZE    100
 
 #define digitalRead(buttonPin) !digitalRead(buttonPin)
 
@@ -39,6 +43,7 @@ float                 loop_t0;
 bool                  first_coord = true;
 bool                  buttonState = false;
 bool                  running = false;
+char                  readBuffer[READ_BUFFER_SIZE];
 
 void ticker_blink(uint16_t del, uint16_t c1r, uint16_t c1g, uint16_t c1b)
 {
@@ -108,7 +113,7 @@ int get_content_size(void)
 void send_post(void)
 {
   uint16_t t0;
-
+  uint8_t bytesread;
   connectToNetwork();
   connectToServer();
   pixels.setPixelColor(0, pixels.Color(0, 0, 50));
@@ -126,8 +131,17 @@ void send_post(void)
   client.println(get_content_size());
   client.println();
   file = SPIFFS.open("/data.txt");
-  while (file.available())
-    client.print((char)file.read());
+  bytesread = 1;
+  while (file.available() && bytesread > 0)
+//    client.print((char)file.read());
+  {
+    bytesread = file.readBytes(readBuffer, READ_BUFFER_SIZE - 1);
+    readBuffer[READ_BUFFER_SIZE] = '\n';
+    client.printf("%s", readBuffer);
+    Serial.println("new loop");
+    Serial.println(bytesread);
+    Serial.printf("%s\n", readBuffer);
+  }
   file.close();
   client.stop();
   for (int i = 0; i < 10; i++)
@@ -286,6 +300,9 @@ void loop()
     else
     {
       Serial.println("Invalid location");
+      Serial.println(Serial2.available());
+      Serial.println(gps.encode(Serial2.read()));
+      Serial.println(gps.location.isValid());
       if (state == 1)
       {
         state = 0;
