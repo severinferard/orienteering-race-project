@@ -17,7 +17,6 @@
       <v-icon>mdi-chevron-right</v-icon>
       <span class="px-3">{{ id }}</span>
       <v-spacer></v-spacer>
-      <v-btn class="mx-3" outlined :to="`/session/${session.id}/#`">Autres éleves</v-btn>
       <v-btn class="mx-3" outlined :to="`/student-summary/${clss.id}/${id}`">Resumé des séances</v-btn>
       <v-progress-linear :active="loadingData" :indeterminate="loadingData" absolute bottom color="blue darken-4"></v-progress-linear>
     </v-app-bar>
