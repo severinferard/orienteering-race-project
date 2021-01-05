@@ -16,9 +16,9 @@ export default {
     //
   }),
   async created() {
-	  const date = (new Date()).toISOString().slice(0,10)
-	  const time = (new Date()).toISOString().substr(11, 8)
-	  await axios.post(`/api/setTime/`, {date, time});
+      const date = (new Date()).toISOString().slice(0,10)
+      const time = (new Date()).toISOString().substr(11, 8)
+      await axios.post(`/api/setTime/`, {date, time});
   },
 };
 </script>
