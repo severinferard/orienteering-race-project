@@ -5,12 +5,12 @@
 #include "SPIFFS.h"
 #include <Ticker.h>
 
-//#define SERVER_IP           "10.0.60.1"
-//#define WIFI_SSID           "Movuino"
-//#define WIFI_PASSWORD       "movuino2020"
-#define SERVER_IP           "10.12.181.117"
-#define WIFI_SSID           "CRI-MAKERLAB"
-#define WIFI_PASSWORD       "--criMAKER--"
+#define SERVER_IP           "10.0.60.1"
+#define WIFI_SSID           "Movuino"
+#define WIFI_PASSWORD       "movuino2020"
+//#define SERVER_IP           "10.12.181.117"
+//#define WIFI_SSID           "CRI-MAKERLAB"
+//#define WIFI_PASSWORD       "--criMAKER--"
 #define MOV_ID              "mov02"
 #define FIRMWARE_VERSION    "1.0"
 #define SAMPLE_RATE         "0.1"
@@ -48,7 +48,7 @@ char                  readBuffer[READ_BUFFER_SIZE];
 void ticker_blink(uint16_t del, uint16_t c1r, uint16_t c1g, uint16_t c1b)
 {
   static bool blink_state = false;
-  
+
   color[0] = c1r;
   color[1] = c1g;
   color[2] = c1b;
@@ -133,7 +133,7 @@ void send_post(void)
   file = SPIFFS.open("/data.txt");
   bytesread = 1;
   while (file.available() && bytesread > 0)
-//    client.print((char)file.read());
+    //    client.print((char)file.read());
   {
     bytesread = file.readBytes(readBuffer, READ_BUFFER_SIZE - 1);
     readBuffer[READ_BUFFER_SIZE] = '\n';
@@ -278,37 +278,34 @@ void loop()
       }
     }
   }
-  if (millis() - loop_t0 >= 200)
+  if (Serial2.available() > 0 && gps.encode(Serial2.read()) && gps.location.isValid())
   {
-    loop_t0 = millis();
-    if (Serial2.available() > 0 && gps.encode(Serial2.read()) && gps.location.isValid())
+    Serial.println("Valid location");
+    if (state == 0)
     {
-      Serial.println("Valid location");
-      if (state == 0)
-      {
-        state = 1;
-        ticker.detach();
-        pixels.setPixelColor(0, pixels.Color(0, 50, 0)); pixels.show();
-      }
-      if (running)
-      {
-        coords.lat =  gps.location.lat();
-        coords.lng =  gps.location.lng();
-        write_data();
-      }
+      state = 1;
+      ticker.detach();
+      pixels.setPixelColor(0, pixels.Color(0, 50, 0)); pixels.show();
     }
-    else
+    if (running)
     {
-      Serial.println("Invalid location");
-      Serial.println(Serial2.available());
-      Serial.println(gps.encode(Serial2.read()));
-      Serial.println(gps.location.isValid());
-      if (state == 1)
-      {
-        state = 0;
-        Serial.println(2);
-        ticker_blink(500, 0, 50, 0);
-      }
+      coords.lat =  gps.location.lat();
+      coords.lng =  gps.location.lng();
+      write_data();
     }
+    delay(200);
+  }
+  else
+  {
+    Serial.println("Invalid location");
+//    Serial.println(Serial2.available());
+//    Serial.println(gps.encode(Serial2.read()));
+//    Serial.println(gps.location.isValid());
+    //      if (state == 1)
+    //      {
+    //        state = 0;
+    //        Serial.println(2);
+    //        ticker_blink(500, 0, 50, 0);
+    //      }
   }
 }

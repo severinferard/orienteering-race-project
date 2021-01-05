@@ -5,7 +5,7 @@
 </template>
 
 <script>
-
+import axios from "axios";
 export default {
   name: 'App',
 
@@ -15,6 +15,11 @@ export default {
   data: () => ({
     //
   }),
+  async created() {
+	  const date = (new Date()).toISOString().slice(0,10)
+	  const time = (new Date()).toISOString().substr(11, 8)
+	  await axios.post(`/api/setTime/`, {date, time});
+  },
 };
 </script>
 <style>

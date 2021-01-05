@@ -21,6 +21,7 @@ const classes = require('./routes/api/classes').classes
 const studentSummary = require('./routes/api/studentSummary')
 const targetSession = require('./routes/api/targetSession')
 const excelCreator = require('./routes/api/excelCreator')
+const setTime = require('./routes/api/setTime')
 
 app.use('/api/sessions', sessions)
 app.use('/api/runs', runs)
@@ -31,6 +32,7 @@ app.use('/api/classes', classes)
 app.use('/api/student-summary', studentSummary)
 app.use('/api/targetSession', targetSession)
 app.use('/api/excel', excelCreator)
+app.use('/api/setTime', setTime)
 app.use('/atlas', express.static('atlas'))
 
 //if (process.env.NODE_ENV === 'production') {
