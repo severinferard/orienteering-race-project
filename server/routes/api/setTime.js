@@ -1,13 +1,14 @@
 const express = require("express");
-
+const { exec } = require('child_process')
 const router = express.Router();
 module.exports = router;
 let isSet = false;
 
 // Get student data
 router.post("/", async (req, res) => {
-	console.log(`sudo timedatectl set-time '${req.body.date} ${req.body.time}'`)
-  if (process.env.NODE_ENV === "production" && !isSet)
+  if (!isSet)
+	{
+    console.log(`sudo timedatectl set-time '${req.body.date} ${req.body.time}'`)
     exec(`sudo timedatectl set-time '${req.body.date} ${req.body.time}'`, (error, stdout, stderr) => {
       if (error) {
         console.log(`error: ${error.message}`);
@@ -20,4 +21,5 @@ router.post("/", async (req, res) => {
       console.log(`stdout: ${stdout}`);
       isSet = true;
     });
+ }
 });
