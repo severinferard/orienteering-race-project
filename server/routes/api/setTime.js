@@ -6,6 +6,7 @@ let isSet = false;
 
 // Get student data
 router.post("/", async (req, res) => {
+	console.log(`sudo timedatectl set-time '${req.body.date} ${req.body.time}'`)
   if (process.env.NODE_ENV === "production" && !isSet)
     exec(`sudo timedatectl set-time '${req.body.date} ${req.body.time}'`, (error, stdout, stderr) => {
       if (error) {
