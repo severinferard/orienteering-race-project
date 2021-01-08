@@ -80,6 +80,7 @@ router.delete("/:session_id/:student_id", async (req, res) => {
     useUnifiedTopology: true,
   });
   try {
+	  console.log('id to delete', req.params.student_id)
     const sessions = client.db("orienteering-race-project").collection("sessions");
     sessions.updateOne({ _id: mongodb.ObjectID(req.params.session_id) }, { $pull: { runs: { _id: mongodb.ObjectID(req.params.student_id) } } }, (err, res) => {
       if (err) throw err;

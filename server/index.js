@@ -33,7 +33,7 @@ app.use('/api/student-summary', studentSummary)
 app.use('/api/targetSession', targetSession)
 app.use('/api/excel', excelCreator)
 app.use('/api/setTime', setTime)
-app.use('/atlas', express.static('atlas'))
+app.use('/atlas', express.static(__dirname + '/atlas/'))
 
 //if (process.env.NODE_ENV === 'production') {
  if (true) {

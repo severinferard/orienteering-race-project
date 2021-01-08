@@ -11,23 +11,21 @@
 //#define SERVER_IP           "10.12.181.117"
 //#define WIFI_SSID           "CRI-MAKERLAB"
 //#define WIFI_PASSWORD       "--criMAKER--"
-#define MOV_ID              "mov02"
+//#define SERVER_IP           "192.168.1.9"
+//#define WIFI_SSID           "Freebox-446ADC"
+//#define WIFI_PASSWORD       "adtraxerit&-agitentur*-virosarum-buria"
+#define MOV_ID              "mov03"
 #define FIRMWARE_VERSION    "1.0"
-#define SAMPLE_RATE         "0.1"
+#define SAMPLE_RATE         "0.2"
 
 #define PIN                 15
 #define NUMPIXELS           1
 #define RXD2                38
 #define TXD2                39
 #define buttonPin           13
-#define READ_BUFFER_SIZE    100
+#define READ_BUFFER_SIZE    10
 
 #define digitalRead(buttonPin) !digitalRead(buttonPin)
-
-typedef struct        s_coords {
-  double lat;
-  double lng;
-}                     t_coords;
 
 static const uint32_t GPSBaud = 9600;
 TinyGPSPlus           gps;
@@ -36,14 +34,12 @@ File                  file;
 WiFiClient            client;
 Ticker                ticker;
 unsigned int          button_t0;
-t_coords              coords;
 uint16_t              color[3];
 uint16_t              state = 0;
 float                 loop_t0;
 bool                  first_coord = true;
 bool                  buttonState = false;
 bool                  running = false;
-char                  readBuffer[READ_BUFFER_SIZE];
 
 void ticker_blink(uint16_t del, uint16_t c1r, uint16_t c1g, uint16_t c1b)
 {
@@ -61,51 +57,27 @@ void ticker_blink(uint16_t del, uint16_t c1r, uint16_t c1g, uint16_t c1b)
   });
 }
 
-void write_data()
+void write_data(double lat, double lng)
 {
   if (!first_coord)
-  {
     file.print(",");
-    first_coord = false;
-  }
+  first_coord = false;
   file.print("[");
-  file.print(coords.lat, 15);
+  file.print(lat, 15);
   file.print(F(","));
-  file.print(coords.lng, 15);
+  file.print(lng, 15);
   file.print("] ");
-}
-
-void terminate_file(void)
-{
-  file.print("]}");
-}
-
-void send_data(void)
-{
-  terminate_file();
-  file.close();
-  file = SPIFFS.open("/data.txt");
-  Serial.println("file content:");
-  while (file.available())
-  {
-    Serial.write(file.read());
-  }
-  file.close();
-  Serial.println();
-  send_post();
 }
 
 int get_content_size(void)
 {
-  uint16_t len;
+  uint16_t  len;
+  char      buff[READ_BUFFER_SIZE];
 
   len = 0;
   file = SPIFFS.open("/data.txt");
-  while (file.available())
-  {
-    Serial.print((char)file.read());
-    len++;
-  }
+  while (file.available() && len % (READ_BUFFER_SIZE - 1) == 0)
+    len += file.readBytes(buff, READ_BUFFER_SIZE - 1);
   file.close();
   return (len);
 }
@@ -113,13 +85,17 @@ int get_content_size(void)
 void send_post(void)
 {
   uint16_t t0;
-  uint8_t bytesread;
+  uint16_t bytesread;
+  uint16_t content_size;
+  char     readBuffer[READ_BUFFER_SIZE];
+
   connectToNetwork();
   connectToServer();
+  content_size = get_content_size();
   pixels.setPixelColor(0, pixels.Color(0, 0, 50));
   pixels.show();
   Serial.print("content size ");
-  Serial.println(get_content_size());
+  Serial.println(content_size);
   Serial.println("Connected to Server");
   Serial.println("Sending POST request");
   client.println("POST /api/upload HTTP/1.1");
@@ -128,20 +104,20 @@ void send_post(void)
   client.println("Connection: close");
   client.println("Content-Type: application/json");
   client.print("Content-Length: ");
-  client.println(get_content_size());
+  client.println(content_size + 2);
   client.println();
   file = SPIFFS.open("/data.txt");
-  bytesread = 1;
-  while (file.available() && bytesread > 0)
-    //    client.print((char)file.read());
+  bytesread = READ_BUFFER_SIZE - 1;
+  while (file.available() && bytesread == READ_BUFFER_SIZE - 1)
   {
     bytesread = file.readBytes(readBuffer, READ_BUFFER_SIZE - 1);
-    readBuffer[READ_BUFFER_SIZE] = '\n';
+    readBuffer[bytesread] = '\0';
     client.printf("%s", readBuffer);
-    Serial.println("new loop");
     Serial.println(bytesread);
-    Serial.printf("%s\n", readBuffer);
+    Serial.printf("%s|", readBuffer);
   }
+  Serial.printf("]}");
+  client.printf("]}");
   file.close();
   client.stop();
   for (int i = 0; i < 10; i++)
@@ -150,6 +126,9 @@ void send_post(void)
     pixels.show();
     delay(100);
   }
+  pixels.setPixelColor(0,  pixels.Color(50, 50, 50));
+  pixels.show();
+  delay(100000);
 }
 
 void connectToNetwork(void) {
@@ -187,19 +166,9 @@ void connectToServer(void)
 
 void recovery_mode(void)
 {
-  char c;
-
   pixels.setPixelColor(0, pixels.Color(50, 0, 50));
   pixels.show();
-  file = SPIFFS.open("/data.txt");
-  while (file.available())
-    c = (char)file.read();
-  if (c != '}')
-    terminate_file();
-  file.close();
   send_post();
-  delay(10000000);
-
 }
 
 void boot_sequence(void)
@@ -230,16 +199,16 @@ void setup()
   Serial2.begin(GPSBaud, SERIAL_8N1, RXD2, TXD2);
   pixels.begin();
 
-  Serial.println(SPIFFS.begin(true) ? "SPIFFS Mounted successfully" : "SPIFFS Mount Failed");
-  Serial.println((file = SPIFFS.open("/data.txt", "w")) ? "File successfully opened for Writing" : "File opening failed");
-  Serial.println(file.print("{\"id\": \"" MOV_ID "\",                  \
-                   \"firmwareVersion\":" FIRMWARE_VERSION ",\
-                   \"sampleRate\":" SAMPLE_RATE",           \
-                   \"data\": [") ? "wrote to file successfully" : "error writing file");
+  WiFi.mode(WIFI_OFF);
+  btStop();
 
-  Serial.println();
-  loop_t0 = millis();
+  Serial.println(SPIFFS.begin(true) ? "SPIFFS Mounted successfully" : "SPIFFS Mount Failed");
   boot_sequence();
+  Serial.println((file = SPIFFS.open("/data.txt", "w")) ? "File successfully opened for Writing" : "File opening failed");
+  Serial.println(file.print("{\"id\": \"" MOV_ID "\",\"firmwareVersion\":" FIRMWARE_VERSION ", \"sampleRate\":" SAMPLE_RATE",\"data\": [") ? "wrote to file successfully" : "error writing file");
+  Serial.println();
+  
+  loop_t0 = millis();
   ticker_blink(500, 0, 50, 0);
 }
 
@@ -261,7 +230,7 @@ void loop()
           pixels.show();
           while (digitalRead(buttonPin));
           delay(1000);
-          terminate_file();
+          //terminate_file();
           file.close();
           send_post();
         }
@@ -288,24 +257,9 @@ void loop()
       pixels.setPixelColor(0, pixels.Color(0, 50, 0)); pixels.show();
     }
     if (running)
-    {
-      coords.lat =  gps.location.lat();
-      coords.lng =  gps.location.lng();
-      write_data();
-    }
+      write_data(gps.location.lat(), gps.location.lng());
     delay(200);
   }
   else
-  {
     Serial.println("Invalid location");
-//    Serial.println(Serial2.available());
-//    Serial.println(gps.encode(Serial2.read()));
-//    Serial.println(gps.location.isValid());
-    //      if (state == 1)
-    //      {
-    //        state = 0;
-    //        Serial.println(2);
-    //        ticker_blink(500, 0, 50, 0);
-    //      }
-  }
 }

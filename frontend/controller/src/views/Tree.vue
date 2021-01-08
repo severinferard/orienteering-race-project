@@ -192,7 +192,7 @@
                   <v-card flat class="overflow-y-auto">
                     <v-list>
                       <v-list-item-group>
-                        <v-list-item v-for="run in selected.runs" :key="run.id" @click="test(run._id)">
+                        <v-list-item v-for="run in selected.runs" :key="run._id" @click="test(run._id)">
                           <v-list-item-icon>
                             <v-img max-height="50" contain src="@/assets/chronometer.svg"> </v-img>
                           </v-list-item-icon>
@@ -567,7 +567,10 @@ export default {
       const session = this.selected;
       const run = session.children.find((run) => run.id === this.delete.id);
       await axios.delete(`/api/runs/${this.selected.id}/${run.id}`);
-      session.runs.splice(session.runs.indexOf(session.runs.find((e) => e.id === run.id)), 1);
+      console.log('run.id', run.id)
+      console.log('run._id', run._id)
+      console.log('session.runs', session.runs)
+      session.runs.splice(session.runs.indexOf(session.runs.find((e) => e._id === run.id)), 1);
       session.children.splice(session.children.indexOf(run), 1);
     },
     // ==================================================================================== New class =================================
