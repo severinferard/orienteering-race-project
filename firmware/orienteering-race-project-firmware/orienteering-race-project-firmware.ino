@@ -14,7 +14,7 @@
 //#define SERVER_IP           "192.168.1.9"
 //#define WIFI_SSID           "Freebox-446ADC"
 //#define WIFI_PASSWORD       "adtraxerit&-agitentur*-virosarum-buria"
-#define MOV_ID              "mov03"
+#define MOV_ID              "mov22"
 #define FIRMWARE_VERSION    "1.0"
 #define SAMPLE_RATE         "0.2"
 
@@ -23,7 +23,7 @@
 #define RXD2                38
 #define TXD2                39
 #define buttonPin           13
-#define READ_BUFFER_SIZE    10
+#define READ_BUFFER_SIZE    1000
 
 #define digitalRead(buttonPin) !digitalRead(buttonPin)
 
@@ -57,15 +57,37 @@ void ticker_blink(uint16_t del, uint16_t c1r, uint16_t c1g, uint16_t c1b)
   });
 }
 
-void write_data(double lat, double lng)
+void write_data()
 {
   if (!first_coord)
     file.print(",");
   first_coord = false;
   file.print("[");
-  file.print(lat, 15);
+  file.print(gps.location.lat(), 15);
   file.print(F(","));
-  file.print(lng, 15);
+  file.print(gps.location.lng(), 15);
+  file.print(F(","));
+  file.print(millis());
+//  file.print("[");
+//  file.print(gps.date.month());
+//  file.print(F(","));
+//  file.print(gps.date.day());
+//  file.print(F(","));
+//  file.print(gps.date.year());
+//  file.print(",");
+//  if (gps.time.hour() < 10) file.print(F("0"));
+//  file.print(gps.time.hour());
+//  file.print(F(","));
+//  if (gps.time.minute() < 10) file.print(F("0"));
+//  file.print(gps.time.minute());
+//  file.print(F(","));
+//  if (gps.time.second() < 10) file.print(F("0"));
+//  file.print(gps.time.second());
+//  file.print(F(","));
+//  if (gps.time.centisecond() < 10) file.print(F("0"));
+//  file.print(gps.time.centisecond());
+//  file.print(F("0"));
+//  file.print("]");
   file.print("] ");
 }
 
@@ -257,7 +279,7 @@ void loop()
       pixels.setPixelColor(0, pixels.Color(0, 50, 0)); pixels.show();
     }
     if (running)
-      write_data(gps.location.lat(), gps.location.lng());
+      write_data();
     delay(200);
   }
   else

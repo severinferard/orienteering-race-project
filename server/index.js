@@ -33,11 +33,11 @@ app.use('/api/student-summary', studentSummary)
 app.use('/api/targetSession', targetSession)
 app.use('/api/excel', excelCreator)
 app.use('/api/setTime', setTime)
-app.use('/atlas', express.static(__dirname + '/atlas/'))
+app.use('/atlas', express.static(__dirname + '/atlas3/'))
 
 //if (process.env.NODE_ENV === 'production') {
  if (true) {
-    console.log('production')
+    console.log('production y')
     app.use(express.static(__dirname + '/public/'))
     app.get(/.*/, (req, res) => {
         res.sendFile(__dirname  + '/public/index.html')
