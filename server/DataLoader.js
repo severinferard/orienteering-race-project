@@ -14,20 +14,23 @@ class DataLoader {
     })
   }
 
+  // km/h
   static getSpeedFromPoints (points, sampleRate) {
     return points.map((point, index) => {
       if (index === 0) return 0
-      return turfDistance(point, points[index - 1]) / (sampleRate / 3600)
+      return turfDistance(point, points[index - 1]) / ((point[2] - points[index - 1][2]) / 3600000)
     })
   }
 
+  //m
   static getDistancesFromPoints (points, sampleRate) {
     return points.map((point, index) => {
       if (index === 0) return 0
-      return turfDistance(point, points[index - 1])
+      return turfDistance(point, points[index - 1]) * 1000
     })
   }
 
+  //m
   static getDistanceFromPoints (points) {
     const dists = points.map((point, index) => {
       if (index === 0) return 0
@@ -38,10 +41,17 @@ class DataLoader {
     return dists.reduce((a, b) => a + b)
   }
 
+  //km/h
   static getAverageSpeed (speeds) {
-      if (!speeds.length)
+	  const rectifiedSpeeds = [...speeds]
+		for (let i = 0; i < rectifiedSpeeds.length; i++) {
+			if (i < 2) continue
+			if (rectifiedSpeeds[i] === 0)
+			rectifiedSpeeds[i] = rectifiedSpeeds[i - 1]
+		}
+      if (!rectifiedSpeeds.length)
           return -1;
-    return speeds.reduce((a, b) => a + b) / speeds.length
+    return speeds.reduce((a, b) => a + b) / rectifiedSpeeds.length
   }
 
   static getLastValidedBeacon (beacons) {
@@ -57,28 +67,37 @@ class DataLoader {
         name: b.name,
         coords: b.coords,
         avgSpeed: null,
-        time: null,
+		time: null,
+		timestamp: 0,
+		index: 0,
         lap: null
       }
     })
     points.forEach((point, pi) => {
       mybeacons.forEach((beacon) => {
         if (!beacon.valided && turfDistance(point, beacon.coords) * 1000 < beaconRange) {
-          const lastValided = DataLoader.getLastValidedBeacon(mybeacons)
-          const _speeds = speeds.slice(lastValided.time / sampleRate - 1 || 0, pi + 1)
+		  const lastValided = DataLoader.getLastValidedBeacon(mybeacons)
+		  console.log("lastValided", lastValided)
+          const _speeds = speeds.slice(lastValided.index || 0, pi + 1)
           beacon.avgSpeed = _speeds.reduce((a, b) => a + b) / _speeds.length
-          beacon.distance = DataLoader.getDistancesFromPoints(points, sampleRate).slice(lastValided.time / sampleRate - 1 || 0, pi + 1).reduce((a, b) => a + b)
+          beacon.distance = DataLoader.getDistancesFromPoints(points, sampleRate).slice(lastValided.index || 0, pi + 1).reduce((a, b) => a + b)
           beacon.valided = true
-          beacon.time = pi * sampleRate + 1
-          beacon.lap = beacon.time - lastValided.time || beacon.time
+		  beacon.time = (point[2] - points[0][2]) / 1000
+		  beacon.timestamp = point[2]
+		  beacon.lap = beacon.time - lastValided.time || beacon.time
+		  console.log('pi', pi)
+		  beacon.index = pi
+		  console.log('current', beacon)
         }
       })
     })
     return mybeacons
   }
 
-  static getTime (points, sampleRate) {
-    return points.length * sampleRate
+  static getTime (points) {
+	  console.log(points[points.length - 1][2],      points[0][2]      )
+	  console.log((points[points.length - 1][2] - points[0][2]) / 1000)
+    return (points[points.length - 1][2] - points[0][2]) / 1000
   }
 
   static getBeaconSuccess (session, beaconID) {

@@ -27,14 +27,14 @@ router.get("/:session_id/:student_id", async (req, res) => {
     run.school_name = session.school_name;
     run.school_id = session.school_id;
     run.session_name = session.session_name;
-    run.session_date = session.date;
-    run.bestDistance = session.runs.map((run) => DataLoader.getDistanceFromPoints(run.rawPositions)).sort((a, b) => b - a)[0];
-    run.bestTime = session.runs.map((run) => DataLoader.getTime(run.rawPositions, run.sampleRate)).sort((a, b) => a - b)[0];
+	run.session_date = session.date;
+	run.bestDistance = session.runs.map((run) => DataLoader.getDistanceFromPoints(run.rawPositions)).sort((a, b) => b - a)[0];
+    run.bestTime = session.runs.map((run) => DataLoader.getTime(run.rawPositions)).sort((a, b) => a - b)[0];
     run.speeds = DataLoader.getSpeedFromPoints(run.rawPositions, run.sampleRate);
     run.avgSpeed = DataLoader.getAverageSpeed(run.speeds);
     run.beacons = DataLoader.evaluateBeacons(run.rawPositions, sessionBeacons, beaconRange, run.speeds, run.sampleRate);
-    run.distance = DataLoader.getDistanceFromPoints(run.rawPositions);
-    run.time = DataLoader.getTime(run.rawPositions, run.sampleRate);
+	run.distance = DataLoader.getDistanceFromPoints(run.rawPositions);
+    run.time = DataLoader.getTime(run.rawPositions);
     run.geoJson = GeoJsonLoader.createGeoJson(run);
     res.send(run);
   } catch (error) {

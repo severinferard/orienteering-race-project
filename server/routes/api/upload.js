@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
     id: rawData.id,
     firmwareVersion: rawData.firmwareVersion,
     sampleRate: rawData.sampleRate,
-    rawPositions: rawData.data.map(coord => [coord[1], coord[0], coord[3]]),
+    rawPositions: rawData.data.map(coord => [coord[1], coord[0], coord[2]]),
     comment: '',
 	rating: null,
 	date: new Date().toLocaleString('fr-FR')

@@ -208,7 +208,7 @@
                             height="60"
                             depressed
                             color="transparent"
-                            @click.native.stop="deleteRun(run._id)"
+                            @click.native.stop="deleteRun(run)"
                           >
                             <v-img contain height="30" width="30" src="@/assets/delete.svg"></v-img>
                           </v-btn>
@@ -355,7 +355,9 @@
     </v-dialog>
     <v-dialog v-model="deleteDialog" width="500">
       <v-card>
-        <v-card-title class="headline"> Supprimer {{ selected ? selected.name : "" }} ? </v-card-title>
+          
+        <v-card-title v-if="this.delete.type === 'run'" class="headline"> Supprimer {{ this.delete ? this.delete.name : "" }} ? </v-card-title>
+        <v-card-title v-else class="headline"> Supprimer {{ selected ? selected.name : "" }} ? </v-card-title>
 
         <v-card-text v-if="this.delete.type === 'school'">
           Vous êtes sur le point de supprimer l'établissement "{{ selected ? selected.name : "" }}", cela entrainera la suppression de
@@ -370,8 +372,8 @@
           données relative à "{{ selected ? selected.name : "" }}". Voulez vous continuer ?
         </v-card-text>
         <v-card-text v-else-if="this.delete.type === 'run'">
-          Vous êtes sur le point de supprimer "{{ selected ? selected.name : "" }}" de cette séance, cela entrainera la suppression de
-          toutes les données de "{{ selected ? selected.name : "" }}" relatives à cette séance. Voulez vous continuer ?
+          Vous êtes sur le point de supprimer "{{ this.delete ? this.delete.name : "" }}" de cette séance, cela entrainera la suppression de
+          toutes les données de "{{ `${this.delete}` ? `${this.delete.name}` : "" }}" relatives à cette séance. Voulez vous continuer ?
         </v-card-text>
 
         <v-divider></v-divider>
@@ -556,10 +558,11 @@ export default {
       parent.children.splice(parent.children.indexOf(this.selected), 1);
       this.active = [];
     },
-    deleteRun(id) {
+    deleteRun(run) {
       this.delete.func = this.deleteRunSendReq;
       this.delete.type = "run";
-      this.delete.id = id;
+      this.delete.id = run._id;
+      this.delete.name = run.id;
       this.deleteDialog = true;
     },
     async deleteRunSendReq() {

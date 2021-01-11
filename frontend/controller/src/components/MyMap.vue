@@ -76,7 +76,6 @@ export default {
       L.tileLayer("http://dora:5000/atlas/{z}/{x}/{y}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 18,
-        // maxNativeZoom: 15,
       }).addTo(map);
       document.on;
       map.scrollWheelZoom.disable();
@@ -134,8 +133,7 @@ export default {
           return L.marker(latlng, { icon: iconValided });
         },
         filter: function(feature, layer) {
-          console.log(feature.properties.valided, layer);
-          return feature.properties.valided;
+          return feature.properties.valided || layer;
         },
       }).addTo(this.map);
       L.geoJSON(geojson, {
@@ -166,7 +164,7 @@ export default {
         console.log("data", data);
         this.beacons = data.beacons;
         this.id = data.id;
-        this.chrono = data.time;
+		this.chrono = data.time;
         this.sampleRate = data.sampleRate;
         this.bestChrono = data.bestTime;
         console.log((this.bestChrono / this.chrono) * 100);
@@ -175,7 +173,7 @@ export default {
         this.bestDistance = data.bestDistance.toFixed();
         this.speeds = data.speeds;
         this.geoJson = data.geoJson;
-        this.mapCenter = data.beacons[0].coords;
+        this.mapCenter = data.rawPositions[0];
         this.addGeoJson(this.geoJson);
         this.map.setView([this.mapCenter[1], this.mapCenter[0]], 16);
       } catch (error) {
@@ -187,7 +185,7 @@ export default {
   computed: {
     formatedChrono() {
       return (
-        (this.chrono < 60 ? "0" : (this.chrono / 60).toFixed()) +
+        (this.chrono < 60 ? "0" : Math.floor(this.chrono / 60)) +
         ":" +
         ((this.chrono % 60).toFixed() < 10 ? "0" : "") +
         (this.chrono % 60).toFixed()

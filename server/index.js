@@ -7,7 +7,7 @@ const port = process.env.PORT || 5000;
 
 //const LED = new Gpio(26, 'out')
 const app = express()
-app.use(bodyParser.json())
+app.use(bodyParser.json({limit: '50mb'}))
 app.use(bodyParser.text());
 app.use(cors())
 
