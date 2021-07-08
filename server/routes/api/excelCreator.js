@@ -36,10 +36,12 @@ async function createWorksheetFromSession(workbook, session) {
 		beacons_array.push(beacon.avgSpeed);
 		beacons_array.push(beacon.distance);
 	  });
+	  let chrono_tmp = DataLoader.getTime(run.rawPositions, run.sampleRate);
+	  let chrono = `${Math.floor(chrono_tmp / 60)}:${Math.floor(chrono_tmp % 60)}`
 	  worksheet.addRow([
 		run.id,
 		run.date,
-		DataLoader.getTime(run.rawPositions, run.sampleRate),
+		chrono,
 		run.beacons.filter((b) => b.valided).length,
 		...beacons_array,
 	  ]);
@@ -48,8 +50,7 @@ async function createWorksheetFromSession(workbook, session) {
   worksheet.addRow(['Moyenne', ...headers.map((header, i) => {return !((i+1) == 2 || (i + 1) % 5 == 0) ? { formula: '=AVERAGE(OFFSET(A1,6,COLUMN() - 1,ROW() - 1-7,1))'} : ""}).slice(1, headers.length + 1)])
   worksheet.addRow(['Min', ...headers.map((header, i) => {return !((i+1) == 2 || (i + 1) % 5 == 0) ? { formula: '=MIN(OFFSET(A1,6,COLUMN() - 1,ROW() - 1-7,1))'} : ""}).slice(1, headers.length + 1)])
   worksheet.addRow(['Max', ...headers.map((header, i) => {return !((i+1) == 2 || (i + 1) % 5 == 0) ? { formula: '=MAX(OFFSET(A1,6,COLUMN() - 1,ROW() - 1-7,1))'} : ""}).slice(1, headers.length + 1)])
-  
-	worksheet.addConditionalFormatting({
+  worksheet.addConditionalFormatting({
 	  ref: "A1:CA100",
 	  rules: [
 		{
