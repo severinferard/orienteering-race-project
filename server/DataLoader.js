@@ -1,6 +1,18 @@
+/**
+ * This file defines the DataLoader class
+ *
+ * @summary This file defines the DataLoader class
+ * @author Séverin Férard
+ *
+ * Created at     : 2021-10-06 18:25:25 
+ * Last modified  : 2021-10-14 13:06:20
+ */
+
+
 const turfDistance = require('turf-distance')
 
 class DataLoader {
+	
   static getGeoJsonPointsFromCoords (coords) {
     return coords.map((coord) => {
       return {
@@ -95,8 +107,9 @@ class DataLoader {
   }
 
   static getTime (points) {
-	  console.log(points[points.length - 1][2],      points[0][2]      )
-	  console.log((points[points.length - 1][2] - points[0][2]) / 1000)
+	//   console.log(points);
+	//   console.log(points[points.length - 1][2],      points[0][2]      )
+	//   console.log((points[points.length - 1][2] - points[0][2]) / 1000)
     return (points[points.length - 1][2] - points[0][2]) / 1000
   }
 

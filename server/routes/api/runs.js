@@ -1,7 +1,7 @@
 const express = require("express");
 const mongodb = require("mongodb");
-const DataLoader = require("../../DataLoader");
 const GeoJsonLoader = require("../../GeoJsonLoader");
+const { spawn } = require('child_process');
 
 const router = express.Router();
 module.exports = router;
@@ -28,15 +28,32 @@ router.get("/:session_id/:student_id", async (req, res) => {
     run.school_id = session.school_id;
     run.session_name = session.session_name;
 	run.session_date = session.date;
-	run.bestDistance = session.runs.map((run) => DataLoader.getDistanceFromPoints(run.rawPositions)).sort((a, b) => b - a)[0];
-    run.bestTime = session.runs.map((run) => DataLoader.getTime(run.rawPositions)).sort((a, b) => a - b)[0];
-    run.speeds = DataLoader.getSpeedFromPoints(run.rawPositions, run.sampleRate);
-    run.avgSpeed = DataLoader.getAverageSpeed(run.speeds);
-    run.beacons = DataLoader.evaluateBeacons(run.rawPositions, sessionBeacons, beaconRange, run.speeds, run.sampleRate);
-	run.distance = DataLoader.getDistanceFromPoints(run.rawPositions);
-    run.time = DataLoader.getTime(run.rawPositions);
-    run.geoJson = GeoJsonLoader.createGeoJson(run);
-    res.send(run);
+	const child = spawn("python3", ["../analyse.py"])
+	child.stdin.write(JSON.stringify(session))
+	child.stdin.end();
+	child.stdout.on('data', data => {
+		let parsed = JSON.parse(data.toString('utf8'))
+		run.bestDistance = parsed.bestDistance
+		run.bestTime = parsed.bestTime
+		run.speeds = parsed.speeds
+		run.avgSpeed = parsed.avgSpeed
+		run.beacons = parsed.beacons
+		run.distance = parsed.distance
+		run.time = parsed.time
+		run.geoJson = GeoJsonLoader.createGeoJson(run);
+		console.log("DISTANCE", run.distance)
+		res.send(run);
+	});
+	  
+	// run.bestDistance = session.runs.map((run) => DataLoader.getDistanceFromPoints(run.rawPositions)).sort((a, b) => b - a)[0];
+    // run.bestTime = session.runs.map((run) => DataLoader.getTime(run.rawPositions)).sort((a, b) => a - b)[0];
+    // run.speeds = DataLoader.getSpeedFromPoints(run.rawPositions, run.sampleRate);
+    // run.avgSpeed = DataLoader.getAverageSpeed(run.speeds);
+    // run.beacons = DataLoader.evaluateBeacons(run.rawPositions, sessionBeacons, beaconRange, run.speeds, run.sampleRate);
+	// run.distance = DataLoader.getDistanceFromPoints(run.rawPositions);
+    // run.time = DataLoader.getTime(run.rawPositions);
+    // run.geoJson = GeoJsonLoader.createGeoJson(run);
+    // res.send(run);
   } catch (error) {
     console.log(error);
     res.status(500).send();

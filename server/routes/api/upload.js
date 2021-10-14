@@ -1,7 +1,5 @@
 const express = require('express')
 const mongodb = require('mongodb')
-const DataLoader = require('../../DataLoader')
-const GeoJsonLoader = require('../../GeoJsonLoader')
 
 const router = express.Router()
 module.exports = router

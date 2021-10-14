@@ -24,7 +24,7 @@ export default {
   methods: {
     setupLeaflet() {
       let map = L.map("map");
-           L.tileLayer("http://dora:5000/atlas/{z}/{x}/{y}.png", {
+           L.tileLayer("/atlas/{z}/{x}/{y}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 18,
       }).addTo(map);

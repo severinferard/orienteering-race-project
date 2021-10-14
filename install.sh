@@ -1,28 +1,68 @@
-sudo sudo systemctl stop apt-daily.timer
-sudo systemctl disable apt-daily.timer
-sudo systemctl disable apt-daily.service
-sudo systemctl daemon-reload
+##!/bin/sh
+##
+## This script installs everything to run the DORA project server.
+##
+## THIS SCRIPT MUST BE LAUCHED WITH ROOT PRIVILEGES
+## THIS SCRIPT HAS ONLY BEEN TESTED WITH UBUNTU Server 20.04 LTS
+## Will be installed:
+##	- The wifi-ap snap pack to create a wifi access point
+##	- Mongodbd (server)
+##	- NodeJS and NPM
+##	_ The DORA project sources
+##
+##
+## DISCLAIMER: THIS SERVER IS NOT SECURE. THIS SCRIPT WILL OPEN PORT ON
+## YOUR MACHINE AND THE DATABASE IS OPENED TO THE OUTSIDE WORLD.
+## CONNECT THE MACHINE TO THE INTERNET AT YOUR OWN RISKS.
+## 
 
-sudo apt install snapd
-sudo snap install wifi-ap
-sudo wifi-ap.config set wifi.ssid=Movuino
-sudo wifi-ap.config set wifi.security-passphrase=movuino2020
-sudo wifi-ap.config set wifi.address=10.0.60.1
+# Wifi settings
+WIFI_SSID=Movuino							# <--- MODIFY THOSE
+WIFI_PASSPHRASE=movuino2020
+WIFI_SERVER_STATIC_IP=10.0.60.1
 
+# Stop and disable Ubuntu auto software updates
+systemctl stop apt-daily.timer
+systemctl disable apt-daily.timer
+systemctl disable apt-daily.service
+systemctl daemon-reload
+
+# Install and configure wifi-ap
+apt install snapd											# A reboot may be needed here
+snap install wifi-ap
+wifi-ap.config set wifi.ssid=$WIFI_SSID
+wifi-ap.config set wifi.security-passphrase=$WIFI_PASSPHRASE
+wifi-ap.config set wifi.address=$WIFI_SERVER_STATIC_IP
+wifi-ap.config set wifi.security=wpa2
+wifi-ap.config set disabled=false
+
+# Install Mongodbd
 wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
 echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-sudo apt-get update
-sudo apt-get install -y mongodb-org
+apt-get update
+apt-get install -y mongodb-org
+iptables -A INPUT -p tcp --dport 27017 -j ACCEPT
+sed -i 's/bindIp: 127.0.0.1/bindIp: 0.0.0.0/g' /etc/mongod.conf
 systemctl start mongod
+systemctl enable mongod
 
-curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-sudo apt install nodejs
+# Create Database and Collections
+echo "use doraDB" | mongo
+mongo doraDB --eval 'db.createCollection("sessions")'
+mongo doraDB --eval 'db.createCollection("schools")'
 
-#git clone https://github.com/severinferard/orienteering-race-project.git ~/orienteering-race-project
+# Install NodeJS and NPM
+curl -sL https://deb.nodesource.com/setup_12.x | -E bash -
+apt install nodejs npm
+
+# Get the DORA project Sources
+git clone https://github.com/severinferard/orienteering-race-project.git ~/orienteering-race-project
+
+# Install DORA dependencies
 cd orienteering-race-project/server
 npm install
 
-sudo systemctl enable mongod.service
+# Create a service to start the DORA server on boot
 echo "
 [Unit]
 Description=DORA project nodejs server
@@ -39,7 +79,10 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 " > /lib/systemd/system/dora.service
+systemctl enable dora.service
 
-sudo systemctl enable dora.service
+# Add a custom host name so that "dora" will resolve to the server ip address
+echo "$WIFI_SERVER_STATIC_IP dora" >> /etc/hosts
 
-echo "10.0.60.1 dora" >> /etc/hosts
+# sudo networksetup -createnetworkservice Loopback lo0
+# sudo networksetup -setmanual Loopback 172.20.42.42 255.255.255.255
