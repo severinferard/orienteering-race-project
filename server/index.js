@@ -5,21 +5,15 @@
  * @author Séverin Férard
  *
  * Created at     : 2021-10-06 18:23:48 
- * Last modified  : 2021-10-15 11:41:05
+ * Last modified  : 2021-10-15 20:54:57
  */
 
 const express = require('express')
 const bodyParser = require('body-parser')
 const path = require('path')
 const cors = require('cors')
-const dgram = require('dgram');
-const Netmask = require('netmask').Netmask
-const os = require('os');
 
 const APP_PORT = process.env.PORT || 5000;
-// const BROADCAST_ADDR = new Netmask(os.networkInterfaces()["en0"][0].cidr).broadcast;
-const BROADCAST_ADDR = "10.0.60.255"
-const BROADCAST_PORT = 6024;
 
 const app = express()
 app.use(bodyParser.json({limit: '50mb'}))
@@ -54,17 +48,4 @@ app.get(/.*/, (req, res) => {
 	res.sendFile(__dirname  + '/public/index.html')
 });
 
-
-// function broadcastNew() {
-//     var message = Buffer.from("");
-//     server.send(message, 0, message.length, BROADCAST_PORT, BROADCAST_ADDR, () => {
-// 		// console.log("udp sent")
-// 	});
-// }
-
-// console.log(BROADCAST_ADDR)
 app.listen(APP_PORT, () => console.log('DORA is running on port 5000'))
-// server.bind(function() {
-//     server.setBroadcast(true);
-//     setInterval(broadcastNew, 3000);
-// });

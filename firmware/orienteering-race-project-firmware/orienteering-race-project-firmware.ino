@@ -5,8 +5,8 @@
 #include "SPIFFS.h"
 #include <Ticker.h>
 
-#define SERVER_IP           "10.0.60.19"
-#define SERVER_PORT         5000
+#define SERVER_IP           "dora"
+#define SERVER_PORT         80
 #define WIFI_SSID           "Movuino"
 #define WIFI_PASSWORD       "movuino2020"
 //#define SERVER_IP           "10.12.181.117"
@@ -15,7 +15,7 @@
 //#define SERVER_IP           "192.168.1.9"
 //#define WIFI_SSID           "Freebox-446ADC"
 //#define WIFI_PASSWORD       "adtraxerit&-agitentur*-virosarum-buria"
-#define MOV_ID              "mov01"
+#define MOV_ID              "mov04"
 #define FIRMWARE_VERSION    "1.0"
 #define SAMPLE_RATE         "1"
 
@@ -72,40 +72,20 @@ void write_data()
   file.print("] ");
 }
 
-unsigned long long get_content_size(void)
-{
-  unsigned long long  len;
-  uint16_t            ret;
-  char                buff[READ_BUFFER_SIZE];
-  
-  ret = READ_BUFFER_SIZE - 1;
-  len = 0;
-  file = SPIFFS.open("/data.txt");
-  while (file.available() && ret == (READ_BUFFER_SIZE - 1))
-  {
-    ret = file.readBytes(buff, READ_BUFFER_SIZE - 1);
-    len += ret;
-    Serial.printf("ret: %u len: %llu\n",ret, len);
-  }
-  file.close();
-  return (len);
-}
-
 void send_post(void)
 {
   uint16_t            t0;
   uint16_t            bytesread;
-  unsigned long long  content_size;
   char                readBuffer[READ_BUFFER_SIZE];
 
   connectToNetwork();
   connectToServer();
-  content_size = get_content_size();
-
+  file = SPIFFS.open("/data.txt");
   pixels.setPixelColor(0, pixels.Color(0, 0, 50));
   pixels.show();
   Serial.print("content size ");
-  Serial.printf("%llu\n",content_size);
+  Serial.printf("%llu\n",file.size()));
+  Serial.printf("real file size %d\n", file.size());
   Serial.println("Connected to Server");
   Serial.println("Sending POST request");
   client.println("POST /api/upload HTTP/1.1");
@@ -114,9 +94,8 @@ void send_post(void)
   client.println("Connection: close");
   client.println("Content-Type: application/json");
   client.print("Content-Length: ");
-  client.printf("%llu\n", content_size + 2);
+  client.printf("%llu\n", file.size() + 2);
   client.println();
-  file = SPIFFS.open("/data.txt");
   bytesread = READ_BUFFER_SIZE - 1;
   while (file.available() && bytesread == (READ_BUFFER_SIZE - 1))
   {

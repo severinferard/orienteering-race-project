@@ -102,14 +102,14 @@
         </v-tabs-items>
         </v-card>
         <v-card class="mx-6 my-3" v-for="run in students" :key="run.session.id">
-            <v-row text-align="end" class="px-3">
+            <v-row text-align="" class="px-3">
                 <v-col class="px-3" text-align="end">
                     <span class="overline">{{run.session.name}}</span><br>
                     <span class="subheader">{{run.session.date}}</span>
                     {{run.comment}}
                 </v-col>
                 <v-col>
-                    <img src="@/assets/cool.png" height="100px" />
+                    <img v-if="run.rating > 0" :src="require('../assets/' + emojis[run.rating] + '.png')" height="100px" />
                 </v-col>
             </v-row>
         </v-card>
@@ -144,6 +144,7 @@ export default {
                 { text: "Vitesse moyenne (km/h)", value: "avgSpeed" },
                 { text: "Balises", value: "beaconsSuccess" },
             ],
+			emojis: ["", "cool", "in-love", "happy", "angry", "crying"]
         }
     },
     methods: {
