@@ -6,30 +6,40 @@ const { spawn } = require('child_process');
 const router = express.Router();
 module.exports = router;
 
+function arraymove(arr, fromIndex, toIndex) {
+    var element = arr[fromIndex];
+    arr.splice(fromIndex, 1);
+    arr.splice(toIndex, 0, element);
+}
+
 // Get student data
 router.get("/:session_id/:student_id", async (req, res) => {
-  console.log("get runs");
   const client = await mongodb.MongoClient.connect("mongodb://localhost:27017/", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
   try {
     const sessions = client.db("orienteering-race-project").collection("sessions");
-	const session = (await sessions.find({ _id: mongodb.ObjectID(req.params.session_id) }).toArray())[0];
+	const session = await sessions.findOne({_id: mongodb.ObjectID(req.params.session_id)});
 	console.log('session', session.session_name)
 	console.log('student_id', req.params.student_id)
-	console.log(session.runs[0]._id)
     const run = session.runs.find((run) => run._id == req.params.student_id);
-    const sessionBeacons = session.beacons;
-    const beaconRange = 10;
     run.class_name = session.class_name;
     run.class_id = session.class_id;
     run.school_name = session.school_name;
     run.school_id = session.school_id;
     run.session_name = session.session_name;
 	run.session_date = session.date;
-	const child = spawn("python3", ["../analyse.py"])
-	child.stdin.write(JSON.stringify(session))
+	
+	const child = spawn("python3", [__dirname + "/../../analyse.py"])
+	// place the targeted run at [0] of the runs array
+	const arg = {
+		runs: session.runs.filter(e => e._id != req.params.student_id),
+		beacons: session.beacons
+	}
+	arg.runs.unshift(run)
+
+	child.stdin.write(JSON.stringify(arg))
 	child.stdin.end();
 	child.stdout.on('data', data => {
 		let parsed = JSON.parse(data.toString('utf8'))
@@ -44,16 +54,10 @@ router.get("/:session_id/:student_id", async (req, res) => {
 		console.log("DISTANCE", run.distance)
 		res.send(run);
 	});
-	  
-	// run.bestDistance = session.runs.map((run) => DataLoader.getDistanceFromPoints(run.rawPositions)).sort((a, b) => b - a)[0];
-    // run.bestTime = session.runs.map((run) => DataLoader.getTime(run.rawPositions)).sort((a, b) => a - b)[0];
-    // run.speeds = DataLoader.getSpeedFromPoints(run.rawPositions, run.sampleRate);
-    // run.avgSpeed = DataLoader.getAverageSpeed(run.speeds);
-    // run.beacons = DataLoader.evaluateBeacons(run.rawPositions, sessionBeacons, beaconRange, run.speeds, run.sampleRate);
-	// run.distance = DataLoader.getDistanceFromPoints(run.rawPositions);
-    // run.time = DataLoader.getTime(run.rawPositions);
-    // run.geoJson = GeoJsonLoader.createGeoJson(run);
-    // res.send(run);
+	child.stderr.on('data', data => {
+		console.error(data.toString('utf-8'))
+		res.status(500).send()
+	})
   } catch (error) {
     console.log(error);
     res.status(500).send();

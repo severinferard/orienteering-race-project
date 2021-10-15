@@ -1,7 +1,7 @@
 const express = require('express')
 const mongodb = require('mongodb')
 const GeoJsonLoader = require('../../GeoJsonLoader')
-const { spawn, once } = require('child_process');
+const { spawn } = require('child_process');
 
 const router = express.Router()
 module.exports = router
@@ -18,8 +18,13 @@ router.get('/:class_id/:student_id', async (req, res) => {
 	for (const run of runs ) {
 		if (run !== undefined) {
 			const session = sessions.filter(session => session.class_id == req.params.class_id)[0]
-			const child = spawn("python3", ["../analyse.py"])
-			child.stdin.write(JSON.stringify(session))
+			const child = spawn("python3", [__dirname + "/../../analyse.py"])
+			// we dont need bestTime or bestDistance so no need to add the other students runs
+			const arg = {
+				runs: [run],
+				beacons: session.beacons
+			}
+			child.stdin.write(JSON.stringify(arg))
 			child.stdin.end();
 			let data;
 			await new Promise((resolve, reject) => {

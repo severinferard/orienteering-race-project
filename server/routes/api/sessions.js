@@ -86,7 +86,6 @@ router.get("/:session_id", async (req, res) => {
     const session = await sessions.findOne({ _id: mongodb.ObjectID(req.params.session_id) });
     const school = await schools.findOne({ classes: { $elemMatch: { _id: mongodb.ObjectID(session.class_id) } } });
 	session.schoolId = school._id;
-	console.log("session", session)
     res.send(session);
   } catch (error) {
     console.log(error);
