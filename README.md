@@ -3,6 +3,16 @@
 
 Digital Orienteering Race Application
 
+<p align="center">
+<img src="https://raw.githubusercontent.com/severinferard/orienteering-race-project/master/images/logo-makerlab.png" width="15%"> <img src="https://raw.githubusercontent.com/severinferard/orienteering-race-project/master/images/logo-movuino-removebg-preview.png" width="15%">
+</p>
+
+Made using [@Movuino](https://github.com/movuino) at [@CRI](https://www.cri-paris.org/en).
+
+[![licence](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://opensource.org/licenses/)
+[![Unix like](https://img.shields.io/badge/Platform-Unix%20like-lightgrey.svg)](https://en.wikipedia.org/wiki/Unix-like)
+[![Raspberry pi](https://img.shields.io/badge/Runs%20on-Raspberry%20Pi-ff69b4.svg)](https://www.raspberrypi.org/)
+[![Docker](https://img.shields.io/badge/Runs%20on-Docker-blue.svg)](https://www.docker.com/)
 
 ## Installation
 
