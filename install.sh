@@ -37,8 +37,8 @@ wifi-ap.config set wifi.security=wpa2
 wifi-ap.config set disabled=false
 
 # Install Mongodbd
-wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
 apt-get update
 apt-get install -y mongodb-org
 iptables -A INPUT -p tcp --dport 27017 -j ACCEPT
@@ -52,13 +52,14 @@ mongo doraDB --eval 'db.createCollection("sessions")'
 mongo doraDB --eval 'db.createCollection("schools")'
 
 # Install NodeJS and NPM
-curl -sL https://deb.nodesource.com/setup_12.x | -E bash -
-apt install nodejs npm
+curl -sL https://deb.nodesource.com/setup_12.x | bash -
+apt install nodejs
 
 # Get the DORA project Sources
 git clone https://github.com/severinferard/orienteering-race-project.git ~/orienteering-race-project
 
 # Install DORA dependencies
+apt install -y make build-essential
 cd orienteering-race-project/server
 npm install
 
@@ -70,7 +71,7 @@ Documentation=https://github.com/severinferard/orienteering-race-project
 After=network.target
 
 [Service]
-Environment=PORT=5000
+Environment=PORT=80
 Type=simple
 User=ubuntu
 ExecStart=/usr/bin/node /home/ubuntu/orienteering-race-project/server/index.js
@@ -78,11 +79,11 @@ Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
-" > /lib/systemd/system/dora.service
+" | tee /lib/systemd/system/dora.service
 systemctl enable dora.service
 
 # Add a custom host name so that "dora" will resolve to the server ip address
-echo "$WIFI_SERVER_STATIC_IP dora" >> /etc/hosts
+echo "$WIFI_SERVER_STATIC_IP dora" | tee -a /etc/hosts
 
 # sudo networksetup -createnetworkservice Loopback lo0
 # sudo networksetup -setmanual Loopback 172.20.42.42 255.255.255.255

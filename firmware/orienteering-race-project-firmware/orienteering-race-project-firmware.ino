@@ -84,7 +84,7 @@ void send_post(void)
   pixels.setPixelColor(0, pixels.Color(0, 0, 50));
   pixels.show();
   Serial.print("content size ");
-  Serial.printf("%llu\n",file.size()));
+  Serial.printf("%llu\n",file.size());
   Serial.printf("real file size %d\n", file.size());
   Serial.println("Connected to Server");
   Serial.println("Sending POST request");

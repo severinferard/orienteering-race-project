@@ -5,7 +5,7 @@
  * @author Séverin Férard
  *
  * Created at     : 2021-10-06 18:23:48 
- * Last modified  : 2021-10-15 20:54:57
+ * Last modified  : 2021-10-20 19:58:08
  */
 
 const express = require('express')
@@ -19,8 +19,6 @@ const app = express()
 app.use(bodyParser.json({limit: '50mb'}))
 app.use(bodyParser.text());
 app.use(cors())
-
-const server = dgram.createSocket("udp4");
 
 app.use('/api/sessions',		require('./routes/api/sessions'))
 app.use('/api/runs',			require('./routes/api/runs'))

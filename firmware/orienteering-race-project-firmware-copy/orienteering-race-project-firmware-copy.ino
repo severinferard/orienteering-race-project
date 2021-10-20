@@ -269,7 +269,7 @@ void setup()
 
   Serial.println(SPIFFS.begin(true) ? "SPIFFS Mounted successfully" : "SPIFFS Mount Failed");
   delay(2000);
-  //waitForGPS();
+  waitForGPS();
   Serial.println("push btn");
   waitForRecordToBegin();
   Serial.println("done");
