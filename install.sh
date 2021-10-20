@@ -27,9 +27,12 @@ systemctl disable apt-daily.timer
 systemctl disable apt-daily.service
 systemctl daemon-reload
 
+sleep 1
 # Install and configure wifi-ap
 apt install snapd											# A reboot may be needed here
+sleep 1
 snap install wifi-ap
+sleep 1
 wifi-ap.config set wifi.ssid=$WIFI_SSID
 wifi-ap.config set wifi.security-passphrase=$WIFI_PASSPHRASE
 wifi-ap.config set wifi.address=$WIFI_SERVER_STATIC_IP
@@ -38,9 +41,11 @@ wifi-ap.config set disabled=false
 
 # Install Mongodbd
 wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
+sleep 1
 echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
 apt-get update
 apt-get install -y mongodb-org
+sleep 1
 iptables -A INPUT -p tcp --dport 27017 -j ACCEPT
 sed -i 's/bindIp: 127.0.0.1/bindIp: 0.0.0.0/g' /etc/mongod.conf
 systemctl start mongod
@@ -56,11 +61,11 @@ curl -sL https://deb.nodesource.com/setup_12.x | bash -
 apt install nodejs
 
 # Get the DORA project Sources
-git clone https://github.com/severinferard/orienteering-race-project.git ~/orienteering-race-project
+git clone https://github.com/severinferard/orienteering-race-project.git /home/ubuntu/orienteering-race-project
 
 # Install DORA dependencies
 apt install -y make build-essential
-cd orienteering-race-project/server
+cd /home/ubuntu/orienteering-race-project/server
 npm install
 
 # Create a service to start the DORA server on boot
