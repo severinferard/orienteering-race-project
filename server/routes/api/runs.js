@@ -38,7 +38,7 @@ router.get("/:session_id/:student_id", async (req, res) => {
 		beacons: session.beacons
 	}
 	arg.runs.unshift(run)
-
+	console.log(JSON.stringify(arg))
 	child.stdin.write(JSON.stringify(arg))
 	child.stdin.end();
 	child.stdout.on('data', data => {
@@ -51,7 +51,7 @@ router.get("/:session_id/:student_id", async (req, res) => {
 		run.distance = parsed.distance
 		run.time = parsed.time
 		run.geoJson = GeoJsonLoader.createGeoJson(run);
-		console.log("DISTANCE", run.distance)
+		console.log("BEQCONS", run.beacons)
 		res.send(run);
 	});
 	child.stderr.on('data', data => {

@@ -5,8 +5,10 @@
  * @author Séverin Férard
  *
  * Created at     : 2021-10-06 18:23:48 
- * Last modified  : 2021-10-20 19:58:08
+ * Last modified  : 2021-10-25 14:18:51
  */
+
+const NEW_APP = true
 
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -37,13 +39,18 @@ app.use('/atlas',				express.static(__dirname + '/atlases/hauts_de_seine_17/'))
 app.use('/atlas',				express.static(__dirname + '/atlases/parc_de_la_courneuve_18/'))
 app.use('/atlas',				express.static(__dirname + '/atlases/parc_de_choisy_18/'))
 app.use('/atlas',				express.static(__dirname + '/atlases/versailles_18/'))
-// app.get('/client', (req, res) => {
-// 	res.sendFile(__dirname  + '/routes/client.html')
-// })
 
-app.use(express.static(__dirname + '/public/'))
-app.get(/.*/, (req, res) => {
-	res.sendFile(__dirname  + '/public/index.html')
-});
+
+if (NEW_APP) {
+	app.use(express.static(__dirname + '/public/new/'))
+	app.get(/.*/, (req, res) => {
+		res.sendFile(__dirname  + '/public/new/index.html')
+	});
+} else {
+	app.use(express.static(__dirname + '/public/'))
+	app.get(/.*/, (req, res) => {
+		res.sendFile(__dirname  + '/public/index.html')
+	});
+}
 
 app.listen(APP_PORT, () => console.log('DORA is running on port 5000'))

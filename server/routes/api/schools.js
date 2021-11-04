@@ -13,9 +13,17 @@ router.get('/', async (req, res) => {
   })
   try {
     const collection = client.db('orienteering-race-project').collection('schools')
+	const sessions = client.db("orienteering-race-project").collection("sessions");
     const list = await collection.find({}).toArray()
-    list.forEach((item) => { item.id = item._id })
+    for (const school of list) {
+		school.id = school._id 
+		for (const clss of school.classes) {
+			clss.school_name = school.name
+			clss.sessions = await sessions.find({ class_id: mongodb.ObjectID(clss._id) }).toArray();
+		}
+	}
     res.send(list)
+	console.log(list)
   } catch (error) {
     console.log(error)
   } finally {

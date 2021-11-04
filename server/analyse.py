@@ -114,7 +114,7 @@ def average_speed(positions: List[Tuple[float, float, float]]) -> float:
 
     Returns
     -------
-    average_speed : float representing the average speed in meters/seconds
+    average_speed : float representing the average speed in km/h
     """
 	if not positions:
 		return 0
@@ -205,7 +205,7 @@ def evaluate_beacon(positions: List[Tuple[float, float, float]], beacons: List[D
 		for beacon in ret:
 			if beacon["valided"]:
 				continue
-			if haversine_distance((pos[0], pos[1]), (beacon["coords"][0], beacon["coords"][1])) < BEACON_RADIUS_M:
+			if haversine_distance((pos[1], pos[0]), (beacon["coords"][0], beacon["coords"][1])) < BEACON_RADIUS_M: # switched lat and long
 				already_valided_beacons = [b for b in ret if b["time"] is not None]
 				last_valided = sorted(already_valided_beacons, key=lambda x: x["time"], reverse=True)[-1] if len(already_valided_beacons) else None
 				beacon["valided"] = True

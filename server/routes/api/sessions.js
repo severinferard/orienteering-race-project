@@ -138,7 +138,7 @@ router.put("/:session_id/beacons", async (req, res) => {
       if (err) throw err;
       client.close();
     });
-    res.status(200).send();
+    res.status(200).send(data);
   } catch (error) {
     console.log(error);
     res.status(500).send();
@@ -155,8 +155,9 @@ router.post("/:session_id/beacons", async (req, res) => {
   try {
     const sessions = client.db("orienteering-race-project").collection("sessions");
     const myquery = { _id: mongodb.ObjectID(req.params.session_id) };
+	const _id = Math.random().toString(36).slice(-5);
     const data = {
-      _id: req.body._id,
+      _id: _id,
       id: req.body.id,
       name: "",
       coords: req.body.coords,
@@ -165,7 +166,7 @@ router.post("/:session_id/beacons", async (req, res) => {
     sessions.updateOne(myquery, action, (err, res) => {
       if (err) throw err;
     });
-    res.status(200).send();
+    res.status(200).send(data);
   } catch (error) {
     console.log(error);
     res.status(500).send();
